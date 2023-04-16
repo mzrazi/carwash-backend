@@ -1,0 +1,14 @@
+
+
+block content
+  h1= message
+  p
+    | error:
+    = error.status
+    br
+    | message:
+    = error.message
+    br
+    | stack:
+    = error.stack
+

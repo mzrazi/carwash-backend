@@ -1,0 +1,173 @@
+const  mongoose=require('mongoose')
+const User=require('../models/usermodel')
+const bcrypt=require("bcrypt")
+var jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
+
+
+
+
+
+module.exports={
+
+
+userSignup: async (req, res) => {
+    try {
+      const userdata = req.body;
+      console.log(userdata);
+    
+      // Check if the email already exists and is verified
+      const existingVerifiedUser = await User.findOne({ 
+        email: userdata.email, 
+        emailverified: true 
+      });
+      console.log(existingVerifiedUser);
+      if (existingVerifiedUser) {
+        return res.status(400).json({status:400, message: 'User already exists' });
+      }
+    
+      // Check if the email already exists but is not verified
+      let existingUser = await User.findOne({ 
+        email: userdata.email, 
+        emailverified: false 
+      });
+    
+      if (existingUser) {
+        // Generate a new token
+        const token = jwt.sign({ email: userdata.email }, process.env.SECRET_KEY, {
+          expiresIn: "1h"
+        });
+        const transporter = nodemailer.createTransport({
+          host: 'smtp-relay.sendinblue.com',
+          port: 587,
+          secure: false,
+          auth: {
+            user: process.env.MAILER_Email,
+            pass: process.env.MAILER_PASSWORD
+          }
+        });
+        const mailOptions = {
+          from: process.env.MAILER_Email,
+          to: userdata.email,
+          subject: 'Verify your email address',
+          text: `Please click the following link to verify your email address:${process.env.APP_URL}/cwash/verify-email/${token}`
+        };
+    
+        await transporter.sendMail(mailOptions);
+        return res.status(201).json({ status:201,
+          message: 'User already exists, a new verification email has been sent', 
+          user: existingUser 
+        });
+      } else {
+        // Hash the password
+        const hash = await bcrypt.hash(userdata.password, 10);
+        // Create a new user
+        const user = new User({ 
+          userName: userdata.userName,
+          Phone: userdata.phone,
+          email: userdata.email,
+          password: hash,
+          emailverified: false
+        });
+    
+        // Save the user
+        await user.save();
+
+      
+        const token = jwt.sign({ email: userdata.email }, process.env.SECRET_KEY, {
+          expiresIn: "1h"
+        });
+        // Send an email with the token
+        const transporter = nodemailer.createTransport({
+          host: 'smtp-relay.sendinblue.com',
+          port: 587,
+          secure: false,
+          auth: {
+            user: process.env.MAILER_Email,
+            pass: process.env.MAILER_PASSWORD
+          }
+        });
+      
+        const mailOptions = {
+          from: process.env.MAILER_Email,
+          to: userdata.email,
+          subject: 'Verify your email address',
+          text: `Please click the following link to verify your email address:${process.env.APP_URL}/cwash/verify-email/${token}`
+        };
+        
+        await transporter.sendMail(mailOptions);
+        
+        return res.status(201).json({ status:201,
+          message: 'User created, verification email sent', 
+          user 
+        });
+      }
+     }catch (error) {
+        console.log(error);
+            return res.status(500).json({status:500, message: error.message });
+       }
+        },
+        verifyEmail: (req, res) => {
+          const token = req.params.token;
+          jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+            if (err) {
+              if (err.name === "TokenExpiredError") {
+                User.findOneAndDelete({ Email: decoded.email }, (err, user) => {
+                  if (err) {
+                    return res.status(500).json({ error: err, message: "Deletion error" });
+                  }
+                  if (!user) {
+                    return res.status(401).json({ message: "User not found" });
+                  }
+                  return res.status(200).json({ status: 200, message: "User deleted due to expired token" });
+                });
+              } else {
+                return res.status(401).json({ status: 401, message: "Invalid token" });
+              }
+            } else {
+              const user = await User.findOne({ Email: decoded.email });
+              if (!user) {
+                return res.status(401).json({ status: 401, message: "User not found" });
+              }
+              user.emailverified = true;
+              await user.save();
+         
+              return res.status(200).json({ status: 200, message: "Email verified successfully" });
+            }
+          });
+        },
+        
+        
+        
+        
+        
+        userlogin: async (req, res) => {
+          const { email, password, token } = req.body;
+          try {
+            const user = await User.findOne({ email });
+            if (!user) {
+              return res.status(401).json({ status: 401, message: "User not found" });
+            }
+            if (!user.emailverified) {
+              return res.status(401).json({ status: 401, message: "email not verified" });
+            }
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) {
+              return res.status(401).json({ status: 401, message: "Incorrect password" });
+            }
+         
+           
+            await user.save();
+            return res.status(200).json({ status: 200, message: "Login successful", user });
+          } catch (error) {
+            console.log(error);
+            return res.status(500).json({ status: 500, message: "Server error" });
+          }
+        },
+        
+
+
+
+
+}
