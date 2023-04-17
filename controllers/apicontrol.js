@@ -108,6 +108,9 @@ userSignup: async (req, res) => {
             return res.status(500).json({status:500, message: error.message });
        }
         },
+
+
+
         verifyEmail: (req, res) => {
           const token = req.params.token;
           jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
@@ -164,6 +167,8 @@ userSignup: async (req, res) => {
             return res.status(500).json({ status: 500, message: "Server error" });
           }
         },
+
+  
         
 
 
