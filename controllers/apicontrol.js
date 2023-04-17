@@ -156,7 +156,6 @@ userSignup: async (req, res) => {
             if (!match) {
               return res.status(401).json({ status: 401, message: "Incorrect password" });
             }
-         
            
             await user.save();
             return res.status(200).json({ status: 200, message: "Login successful", user });
