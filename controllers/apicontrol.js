@@ -54,7 +54,15 @@ userSignup: async (req, res) => {
           text: `Please click the following link to verify your email address:${process.env.APP_URL}/cwash/verify-email/${token}`
         };
     
-        await transporter.sendMail(mailOptions);
+        try {
+          await transporter.sendMail(mailOptions);
+          console.log('Email sent successfully');
+          // Your code to handle success goes here
+        } catch (error) {
+          console.log('Error sending email:', error);
+          // Your code to handle error goes here
+        }
+        
         return res.status(201).json({ status:201,
           message: 'User already exists, a new verification email has been sent', 
           user: existingUser 
@@ -96,7 +104,15 @@ userSignup: async (req, res) => {
           text: `Please click the following link to verify your email address:${process.env.APP_URL}/cwash/verify-email/${token}`
         };
         
-        await transporter.sendMail(mailOptions);
+        try {
+          await transporter.sendMail(mailOptions);
+          console.log('Email sent successfully');
+          // Your code to handle success goes here
+        } catch (error) {
+          console.log('Error sending email:', error);
+          // Your code to handle error goes here
+        }
+        
         
         return res.status(201).json({ status:201,
           message: 'User created, verification email sent', 
@@ -116,7 +132,7 @@ userSignup: async (req, res) => {
           jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
             if (err) {
               if (err.name === "TokenExpiredError") {
-                User.findOneAndDelete({ Email: decoded.email }, (err, user) => {
+                User.findOneAndDelete({ email: decoded.email }, (err, user) => {
                   if (err) {
                     return res.status(500).json({ error: err, message: "Deletion error" });
                   }
@@ -129,7 +145,7 @@ userSignup: async (req, res) => {
                 return res.status(401).json({ status: 401, message: "Invalid token" });
               }
             } else {
-              const user = await User.findOne({ Email: decoded.email });
+              const user = await User.findOne({ email: decoded.email });
               if (!user) {
                 return res.status(401).json({ status: 401, message: "User not found" });
               }
