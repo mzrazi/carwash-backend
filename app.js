@@ -4,9 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const dbConnect = require('./config/connection');
+const multer = require('multer');
 
 var apiRouter = require('./routes/api');
-var usersRouter = require('./routes/users');
+var adminRouter = require('./routes/admin');
 require('dotenv').config();
 var app = express();
 
@@ -21,7 +22,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 dbConnect();
 app.use('/cwash', apiRouter);
-app.use('/users', usersRouter);
+app.use('/cwash/adm', adminRouter);
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

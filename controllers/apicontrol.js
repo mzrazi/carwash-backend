@@ -3,6 +3,10 @@ const User=require('../models/usermodel')
 const bcrypt=require("bcrypt")
 var jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const Specialist = require('../models/specialistmodel');
+var Category=require('../models/categorymodel');
+const Contact=require('../models/contactmodel')
+var Offer=require('../models/offersmodel')
 
 
 
@@ -185,7 +189,21 @@ userSignup: async (req, res) => {
             return res.status(500).json({ status: 500, message: "Server error" });
           }
         },
-
+      
+    homepagedata:async(req,res)=>{
+     
+        try {
+          const offers = await Offer.find({});
+          const categories = await Category.find({});
+          const specialists = await Specialist.find({});
+          const contact = await Contact.find({});
+          res.status(200).json({status:200,message:'success' , offers, categories, specialists, contact })
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Error retrieving data' });
+        }
+     
+    }
   
         
 
