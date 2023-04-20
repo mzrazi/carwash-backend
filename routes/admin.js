@@ -35,7 +35,7 @@ const storageOffers = multer.diskStorage({
 });
 const storagespecialists = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, './public/images/offers');
+    cb(null, './public/images/specialists');
   },
   filename: function(req, file, cb) {
     cb(null, `file-${Date.now()}-${Math.random()}${path.extname(file.originalname)}`);
