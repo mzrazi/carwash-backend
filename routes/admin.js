@@ -74,7 +74,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
   var data=req.body
   var newcategory= new Category({
     title:data.title,
-    imagepath:`images/categories/${req.file.filename}`
+    imagepath:`${process.env.APP_URL}/cwash/images/categories/${req.file.filename}`
   })
    try { 
    await newcategory.save() 
@@ -95,7 +95,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
     var newspecialist= new specialist({
       name:data.name,
       category:data.category,
-      imagepath:`images/specialists/${req.file.filename}`
+      imagepath:`${process.env.APP_URL}/cwash/images/specialists/${req.file.filename}`
     })
      try { 
      await newspecialist.save() 
