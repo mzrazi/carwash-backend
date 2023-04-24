@@ -12,7 +12,7 @@ router.get('/verify-email/:token',verifyEmail)
 
 router.get('/home',homepagedata)
 
-router.get('/services',servicespage)
+router.post('/services',servicespage)
 
 router.post('/appointment',addAppointment)
 
