@@ -1,5 +1,5 @@
 var express = require('express');
-const { userlogin, userSignup, verifyEmail,homepagedata } = require('../controllers/apicontrol');
+const { userlogin, userSignup, verifyEmail,homepagedata, servicespage, addAppointment } = require('../controllers/apicontrol');
 var router = express.Router();
 
 /* GET home page. */
@@ -11,5 +11,9 @@ router.get('/verify-email/:token',verifyEmail)
 
 
 router.get('/home',homepagedata)
+
+router.get('/services',servicespage)
+
+router.post('/appointment',addAppointment)
 
 module.exports = router;

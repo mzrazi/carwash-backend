@@ -6,7 +6,9 @@ const nodemailer = require('nodemailer');
 const Specialist = require('../models/specialistmodel');
 var Category=require('../models/categorymodel');
 const Contact=require('../models/contactmodel')
-var Offer=require('../models/offersmodel')
+var Offer=require('../models/offersmodel');
+const service = require('../models/servicemodel');
+const Appointment = require('../models/appointmentmodel');
 
 
 
@@ -203,7 +205,51 @@ userSignup: async (req, res) => {
           res.status(500).json({ message: 'Error retrieving data' });
         }
      
+    },
+
+    servicespage:async(req,res)=>{
+
+      try {
+        const specialists = await Specialist.find({category:req.body.categoryId}).populate('category').exec()
+        ;
+        const services=await service.find({category:req.body.categoryId}).populate('category').exec()
+
+        res.status(200).json({status:200,message:'success' ,  specialists,services })
+
+        
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error retrieving data' });
+      }
+    },
+
+
+   addAppointment : async (req, res) => {
+      try {
+        // create a new appointment object
+        const newAppointment = new Appointment({
+          date: req.body.date,
+          time: req.body.time,
+          services: req.body.serviceIds, // assuming you have an array of serviceIds in the form data
+          userId: req.body.userId,
+          specialistId: req.body.specialistId,
+          totalAmount: req.body.totalAmount,
+          totalDuration: req.body.totalDuration,
+        });
+    
+        // save the appointment to the database
+        const savedAppointment = await newAppointment.save();
+    
+        // populate the service data for the saved appointment
+        await savedAppointment.populate('services')
+    
+        res.status(200).json({ message: 'Appointment added successfully', appointment: savedAppointment });
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error adding appointment', error });
+      }
     }
+    
   
         
 
