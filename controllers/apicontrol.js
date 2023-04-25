@@ -209,13 +209,39 @@ userSignup: async (req, res) => {
     },
 
     servicespage:async(req,res)=>{
-
+      console.log(req.body);
       try {
-        const specialists = await Specialist.find({category:req.body.categoryId}).populate('categories').exec()
-        ;
+
+        const categoryid=req.body.categoryId
+        console.log(categoryid);
+        const specialists = await Specialist.find({})
+        .populate({
+          path: "services",
+          populate: {
+            path: "category",
+            match: { _id: categoryid },
+          },
+        })
+        .exec();
+
+
+        const filteredSpecialists = specialists.filter((specialist) =>
+        specialist.services.some(
+          (service) => service.category !== null && service.category._id == categoryid
+        )
+      );
+
+
+      console.log(filteredSpecialists);
+  
+
+ 
+        
+
+       
         const services=await service.find({category:req.body.categoryId}).populate('category').exec()
 
-        res.status(200).json({status:200,message:'success' ,  specialists,services })
+        res.status(200).json({status:200,message:'success' ,filteredSpecialists,services })
 
         
       } catch (error) {

@@ -5,9 +5,9 @@ const specialistSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  categories: [{
+  services: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
+    ref: 'Service',
     required: true,
   }],
   imagepath: {

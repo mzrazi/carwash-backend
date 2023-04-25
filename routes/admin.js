@@ -95,7 +95,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
    
     var newspecialist= new specialist({
       name:data.name,
-      categories:data.categoryIds,
+      services:data.serviceIds,
       imagepath:`${process.env.APP_URL}/cwash/images/specialists/${req.file.filename}`
     })
      try { 
