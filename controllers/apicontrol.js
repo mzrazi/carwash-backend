@@ -9,6 +9,7 @@ const Contact=require('../models/contactmodel')
 var Offer=require('../models/offersmodel');
 const service = require('../models/servicemodel');
 const Appointment = require('../models/appointmentmodel');
+const message = require('../models/messagemodel');
 
 
 
@@ -210,7 +211,7 @@ userSignup: async (req, res) => {
     servicespage:async(req,res)=>{
 
       try {
-        const specialists = await Specialist.find({category:req.body.categoryId}).populate('category').exec()
+        const specialists = await Specialist.find({category:req.body.categoryId}).populate('categories').exec()
         ;
         const services=await service.find({category:req.body.categoryId}).populate('category').exec()
 
@@ -248,6 +249,32 @@ userSignup: async (req, res) => {
         console.log(error);
         res.status(500).json({ message: 'Error adding appointment', error });
       }
+    },
+    savemessage:async(req,res)=>{
+
+      var msg=req.body
+  
+      
+  
+      var newmessage=new message({
+        title:msg.title,
+        useremail:msg.email,
+        message:msg.message,
+      })
+      try {
+        
+        newmessage.save().then((doc)=>{
+          res.status(200).json({status:200,message:"succesfull"})
+        }).catch((err)=>{
+          res.status(404).json({status:404,message:err.message})
+        })
+      } catch (error) {
+  
+        res.status(500).json({status:500,message:"internal error",err:error})
+      }
+  
+  
+  
     }
     
   

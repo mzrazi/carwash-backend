@@ -84,7 +84,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
       if (err) console.log(err);
       console.log(`${req.file.path} was deleted`);
     });
-    res.status(500).json({message:'error'})
+    res.status(500).json({message:'error'+error})
   }
   
   })
@@ -92,9 +92,10 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
   router.post('/add-specialist',uploadSpecialist.single('image'),async(req,res)=>{
     var data=req.body
     console.log(data);
+   
     var newspecialist= new specialist({
       name:data.name,
-      category:data.category,
+      categories:data.categoryIds,
       imagepath:`${process.env.APP_URL}/cwash/images/specialists/${req.file.filename}`
     })
      try { 
