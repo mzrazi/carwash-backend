@@ -8,6 +8,10 @@ var categorySchema = new mongoose.Schema({
         unique:true,
         index:true,
     },
+    services: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Service',
+      }],
     imagepath:{
         type:String,
         required:true,

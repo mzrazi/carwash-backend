@@ -1,6 +1,9 @@
-const category = require('../models/categorymodel');
-const Contact=require('../models/contactmodel');
+const Category = require('../models/categorymodel');
+const Contact = require('../models/contactmodel');
 const service = require('../models/servicemodel');
+
+
+
 
 
 module.exports={
@@ -28,32 +31,40 @@ module.exports={
         
     },
 
-     addservice : async (req, res) => {
-
+    addservice: async (req, res) => {
       console.log(req.body);
+    
       try {
-
-        const cate = await category.findById(req.body.categoryId);
-        console.log(cate);
-        if (!cate) {
+        const categoryId = req.body.categoryId;
+    
+        // Check if the category exists
+        const category = await Category.findById(categoryId);
+        if (!category) {
           return res.status(404).json({ message: 'Category not found' });
         }
-        // create a new service object
-        const newservice = new service({
+    
+        // Create a new service object
+        const newService = new service({
           title: req.body.title,
           price: req.body.price,
           duration: req.body.duration,
           description: req.body.description,
-          category: req.body.categoryId // assuming you have a categoryId in the form data
+          category: categoryId
         });
     
-        // save the service to the database
-        const savedservice = await newservice.save();
+        // Save the service to the database
+        const savedService = await newService.save();
     
-        res.status(200).json({ message: 'service added successfully', service: savedservice });
+        // Add the service ID to the services array of the category
+        await Category.findByIdAndUpdate(categoryId, {
+          $push: { services: savedService._id }
+        });
+    
+        res.status(200).json({ message: 'Service added successfully', service: savedService });
       } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error adding service'+error });
+        console.error(error);
+        res.status(500).json({ message: 'Error adding service' });
       }
     }
-}
+    
+  }
