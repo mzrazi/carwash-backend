@@ -212,16 +212,23 @@ userSignup: async (req, res) => {
 
       try {
 
-        
-       
-        const specialists =await Specialist.find({})
-        .populate({
-          path: 'categories',
-          populate: {
-            path: 'services',
-          },
+        const categoryId=req.body.categoryId
+        const specialists = await Specialist.find({ categories: categoryId })
+        .populate({ 
+          path: 'categories', 
+          populate: { 
+            path: 'services', 
+          }, 
+          "priority": {
+            "$eq": [
+              "$_id",
+              2
+            ]
+          }
         })
-        .exec()
+        .sort({ categories: 1 })
+        .exec();
+      
 
  
         
