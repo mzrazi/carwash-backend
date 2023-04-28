@@ -63,6 +63,7 @@ userSignup: async (req, res) => {
     
         try {
           await transporter.sendMail(mailOptions);
+          console.log( "mail"+process.env.MAILER_Email);
           console.log('Email sent successfully');
           // Your code to handle success goes here
         } catch (error) {
@@ -103,6 +104,7 @@ userSignup: async (req, res) => {
             pass: process.env.MAILER_PASSWORD
           }
         });
+       
       
         const mailOptions = {
           from: process.env.MAILER_Email,
@@ -113,6 +115,7 @@ userSignup: async (req, res) => {
         
         try {
           await transporter.sendMail(mailOptions);
+      
           console.log('Email sent successfully');
           // Your code to handle success goes here
         } catch (error) {
@@ -184,8 +187,9 @@ userSignup: async (req, res) => {
             if (!match) {
               return res.status(401).json({ status: 401, message: "Incorrect password" });
             }
-           
+            user.tokens.push(token);
             await user.save();
+            
             return res.status(200).json({ status: 200, message: "Login successful", user });
           } catch (error) {
             console.log(error);

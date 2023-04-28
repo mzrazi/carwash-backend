@@ -11,8 +11,10 @@ const userSchema = new Schema({
     password: { type: String, required: true },
     resetToken:{ type:String },
     resetTokenExpiration:{type:String},
-    emailverified: { type: Boolean, default: false}
+    emailverified: { type: Boolean, default: false},
+    tokens: [{ type: String,required:true }]
 })
+
 
 
 
