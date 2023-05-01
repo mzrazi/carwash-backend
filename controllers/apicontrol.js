@@ -460,7 +460,7 @@ userSignup: async (req, res) => {
         // Find user by id
         var updates = req.body;
         console.log(updates);
-        var ID= req.body.UserId
+        var ID= req.body.userId
     
         const user = await User.findById(ID)
         if (!user) {
@@ -479,11 +479,14 @@ userSignup: async (req, res) => {
         console.error(error);
         return  res.status(500).json({status:500,message:"error updating profile",err:error});
       }
-    }, userdetails:(req,res)=>{
+    },
+    
+    userdetails:async (req,res)=>{
       try {
         var id = req.body.userId
       
-     const user= User.findById(id).exec()
+     const user= await User.findById(id).exec()
+     console.log(user);
      if (!user) {
       return res.status(404).json({status:404, message: "User not found" });
     }
