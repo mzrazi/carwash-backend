@@ -16,10 +16,18 @@ var reviewSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-   review:{
+   recommendation:{
+        type:String,
+        enum:['yes','no']
+    }, complete:{
+        type:String,
+        enum:['yes','no']
+        
+    }, review:{
         type:String,
         
     },
+    
     reliability:{
         type:String,
         enum: ['very good', 'good','average','bad','verybad', 'N/a'],

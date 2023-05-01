@@ -445,9 +445,9 @@ userSignup: async (req, res) => {
 
 
     addreview:async(req,res)=>{
-      const { appointmentId, userId, specialistId, review, reliability, tidiness, response, accuracy, pricing, rating } = req.body;
+      const { appointmentId, review, reliability, tidiness, response, accuracy, pricing, rating,complete,recommendation} = req.body;
       try {
-        const newReview = new Review({ appointmentId, userId, specialistId, review, reliability, tidiness, response, accuracy, pricing, rating });
+        const newReview = new Review({ appointmentId, review, reliability, tidiness, response, accuracy, pricing, rating, complete,recommendation});
         const savedReview = await newReview.save();
         res.status(201).json(savedReview);
       } catch (err) {
@@ -480,17 +480,18 @@ userSignup: async (req, res) => {
         return  res.status(500).json({status:500,message:"error updating profile",err:error});
       }
     }, userdetails:(req,res)=>{
-      var id = req.body.userId
+      try {
+        var id = req.body.userId
       
-      User.findById(id).exec((err, user) => {
-        if (err) {
-          return res.status(500).json({status:500, message: "Error retrieving user" });
-        }
-        if (!user) {
-          return res.status(404).json({status:404, message: "User not found" });
-        }
-        return res.status(200).json({status:200,message:"succesful", user });
-      });
+     const user= User.findById(id).exec()
+     if (!user) {
+      return res.status(404).json({status:404, message: "User not found" });
+    }
+    return res.status(200).json({status:200,message:"succesful", user });
+    } catch (error) {
+        return res.status(500).json({status:500, message: "Error retrieving user" });
+        
+      }
     },
 
 
