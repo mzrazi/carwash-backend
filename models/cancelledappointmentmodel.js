@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const appointmentSchema = new mongoose.Schema({
+const cancelledAppointmentSchema = new mongoose.Schema({
   date: {
     type: String,
     required: true,
@@ -32,14 +32,14 @@ const appointmentSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-
-  status:{
+cancelledby:{
     type:String,
-    required:true,
-    enum: ['booked', 'available', 'N/a'],
-    default:'booked'
-  }
+    enum:['user','specialist']
+
+},
+reason:{
+    type:String,
+}
 });
 
-module.exports = mongoose.model('Appointment', appointmentSchema);
-
+module.exports = mongoose.model('CancelledAppointment', cancelledAppointmentSchema);

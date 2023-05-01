@@ -114,7 +114,7 @@ module.exports={
           throw new Error('No valid tokens found');
         }
     
-        // Remove any invalid tokens
+      
         const response = await admin.messaging().sendMulticast({
           tokens,
           notification: {

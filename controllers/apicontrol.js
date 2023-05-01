@@ -11,7 +11,8 @@ const service = require('../models/servicemodel');
 const Appointment = require('../models/appointmentmodel');
 const message = require('../models/messagemodel');
 const moment = require('moment');
-
+const CancelledAppointment = require('../models/cancelledappointmentmodel');
+const Review = require('../models/reviewmodel');
 
 
 
@@ -354,7 +355,187 @@ userSignup: async (req, res) => {
       } catch (error) {
         res.status(500).json({ message: 'error', error: error.message });
       }
+    },
+
+ userCancelAppointment:async(req,res)=> {
+      try {
+
+        const [appointmentId,reason]=req.body
+        const appointment = await Appointment.findById(appointmentId)
+        if (!appointment) {
+          throw new Error('Appointment not found');
+        }
+        const cancelledAppointment = new CancelledAppointment({
+          date: appointment.date,
+          timeslot: appointment.timeslot,
+          services: appointment.services,
+          userId: appointment.userId,
+          specialistId: appointment.specialistId,
+          totalAmount: appointment.totalAmount,
+          totalDuration: appointment.totalDuration,
+          reason:reason,
+          cancelledby:'user'
+        });
+        await cancelledAppointment.save();
+        await Appointment.findByIdAndDelete(appointmentId);
+
+        const specialist=await specialist.findById(appointment.specialistId)
+        const tokens=specialist.tokens
+        const response = await admin.messaging().sendMulticast({
+          tokens,
+          notification: {
+            title:' cancelled ',
+            body: 'appointment cancelled by user because of' +reason
+          }
+        });
+        console.log('FCM response:', response);
+
+
+        
+        return res.status(200).json({message:'success'})
+      } catch (err) {
+        res.status(500).json({message:'error',err})
+        console.error(err);
+        throw err;
+      }
+    },
+    
+    specialistCancelAppointment:async(req,res)=> {
+      try {
+
+        const [appointmentId,reason]=req.body
+        const appointment = await Appointment.findById(appointmentId)
+        if (!appointment) {
+          throw new Error('Appointment not found');
+        }
+        const cancelledAppointment = new CancelledAppointment({
+          date: appointment.date,
+          timeslot: appointment.timeslot,
+          services: appointment.services,
+          userId: appointment.userId,
+          specialistId: appointment.specialistId,
+          totalAmount: appointment.totalAmount,
+          totalDuration: appointment.totalDuration,
+          reason:reason,
+          cancelledby:'specialist'
+        });
+        await cancelledAppointment.save();
+        await Appointment.findByIdAndDelete(appointmentId);
+
+        const user=await User.findById(appointment.userId)
+        const tokens=user.tokens
+        const response = await admin.messaging().sendMulticast({
+          tokens,
+          notification: {
+            title:' cancelled ',
+            body: 'appointment cancelled by specialist because of' +reason
+          }
+        });
+        console.log('FCM response:', response);
+
+
+        
+        return res.status(200).json({message:'success'})
+      } catch (err) {
+        res.status(500).json({message:'error',err})
+        console.error(err);
+        throw err;
+      }
+    },
+
+
+    addreview:async(req,res)=>{
+      const { appointmentId, userId, specialistId, review, reliability, tidiness, response, accuracy, pricing, rating } = req.body;
+      try {
+        const newReview = new Review({ appointmentId, userId, specialistId, review, reliability, tidiness, response, accuracy, pricing, rating });
+        const savedReview = await newReview.save();
+        res.status(201).json(savedReview);
+      } catch (err) {
+        res.status(400).json({ message: err.message });
+      }
+
+    },
+    editProfile: async (req, res) => {
+      try {
+        // Find user by id
+        var updates = req.body;
+        console.log(updates);
+        var ID= req.body.UserId
+    
+        const user = await User.findById(ID)
+        if (!user) {
+          return res.status(404).json({status:404, message: "user not found" });
+        }
+    
+        // Update user details
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: ID },
+          { $set:updates},
+          { new: true }
+        );
+    
+        return res.status(200).json({status:200, message: "Profile updated successfully",updatedUser});
+      } catch (error) {
+        console.error(error);
+        return  res.status(500).json({status:500,message:"error updating profile",err:error});
+      }
+    }, userdetails:(req,res)=>{
+      var id = req.body.userId
+      
+      User.findById(id).exec((err, user) => {
+        if (err) {
+          return res.status(500).json({status:500, message: "Error retrieving user" });
+        }
+        if (!user) {
+          return res.status(404).json({status:404, message: "User not found" });
+        }
+        return res.status(200).json({status:200,message:"succesful", user });
+      });
+    },
+
+
+    completedjob:async(req,res)=>{
+      try {
+
+        const [appointmentId]=req.body
+        const appointment = await Appointment.findById(appointmentId)
+        if (!appointment) {
+          throw new Error('Appointment not found');
+        }
+        const completedAppointment = new CompletedAppointment({
+          date: appointment.date,
+          timeslot: appointment.timeslot,
+          services: appointment.services,
+          userId: appointment.userId,
+          specialistId: appointment.specialistId,
+          totalAmount: appointment.totalAmount,
+          totalDuration: appointment.totalDuration,
+        });
+        await completedAppointment.save();
+        await Appointment.findByIdAndDelete(appointmentId);
+
+        const user=await User.findById(appointment.userId)
+        const tokens=user.tokens
+        const response = await admin.messaging().sendMulticast({
+          tokens,
+          notification: {
+            title:' completed ',
+            body: 'job completed'
+          }
+        });
+        console.log('FCM response:', response);
+
+
+        
+        return res.status(200).json({message:'success'})
+      } catch (err) {
+        res.status(500).json({message:'error',err})
+        console.error(err);
+        throw err;
+      }
+
     }
+    
     
         
 
