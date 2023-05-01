@@ -12,7 +12,8 @@ const {
     userdetails,
     userCancelAppointment,
     completedjob,
-    addreview
+    addreview,
+    getAppointmentHistory
 } = require('../controllers/apicontrol');
 var router = express.Router();
 
@@ -30,6 +31,7 @@ router.post("/message", savemessage)
 router.post('/user-cancel',userCancelAppointment)
 router.post('/complete-job',completedjob)
 router.post('/add-review',addreview)
+router.post('/get-appointments',getAppointmentHistory)
 
 module.exports = router;
 

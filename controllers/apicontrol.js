@@ -13,7 +13,8 @@ const message = require('../models/messagemodel');
 const moment = require('moment');
 const CancelledAppointment = require('../models/cancelledappointmentmodel');
 const Review = require('../models/reviewmodel');
-
+const admin = require('firebase-admin');
+const CompletedAppointment = require('../models/completedappointment');
 
 
 
@@ -360,10 +361,10 @@ userSignup: async (req, res) => {
  userCancelAppointment:async(req,res)=> {
       try {
 
-        const [appointmentId,reason]=req.body
+        const {appointmentId,reason}=req.body
         const appointment = await Appointment.findById(appointmentId)
         if (!appointment) {
-          throw new Error('Appointment not found');
+          res.status(404).json('Appointment not found');
         }
         const cancelledAppointment = new CancelledAppointment({
           date: appointment.date,
@@ -379,7 +380,7 @@ userSignup: async (req, res) => {
         await cancelledAppointment.save();
         await Appointment.findByIdAndDelete(appointmentId);
 
-        const specialist=await specialist.findById(appointment.specialistId)
+        const specialist=await Specialist.findById(appointment.specialistId)
         const tokens=specialist.tokens
         const response = await admin.messaging().sendMulticast({
           tokens,
@@ -538,7 +539,32 @@ userSignup: async (req, res) => {
         throw err;
       }
 
+    },
+
+
+   getAppointmentHistory: async (req,res) => {
+      try {
+
+        const userId=req.body.userId
+        const upcomingAppointments = await Appointment.find({ userId: userId, status: 'booked' })
+          .populate('services specialistId')
+          .sort({ date: 1 });
+    
+        const cancelledAppointments = await CancelledAppointment.find({ userId: userId })
+          .populate('services specialistId')
+          .sort({ date: -1 });
+    
+        const completedAppointments = await CompletedAppointment.find({ userId: userId })
+          .populate('services specialistId')
+          .sort({ date: -1 });
+    
+        return res.status(200).json({ upcoming: upcomingAppointments, history: [...cancelledAppointments, ...completedAppointments] });
+      } catch (err) {
+        res.status(500).json({message:'error',err})
+        console.error(err);
+      }
     }
+    
     
     
         
