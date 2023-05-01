@@ -8,7 +8,7 @@ var Category=require('../models/categorymodel');
 const { log } = require('console');
 const specialist = require('../models/specialistmodel');
 const fs = require('fs');
-const { addContact, addservice } = require('../controllers/admincontrol');
+const { addContact, addservice, sendnotification } = require('../controllers/admincontrol');
 
 
 
@@ -109,12 +109,14 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
       res.status(500).json({message:error})
     }
     
-    })
+    }) 
+ 
 
-
-    router.post('/add-contact',addContact)
+    router.post('/add-contact',addContact) 
 
     router.post('/add-service',addservice)
+
+    router.post('/send-notfication',sendnotification)
   
   
 

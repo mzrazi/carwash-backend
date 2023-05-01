@@ -101,6 +101,7 @@ module.exports={
         if (selectedUsers === 'all') {
           const users = await User.find({ emailverified: true });
           tokens = users.flatMap((user) => user.tokens);
+          console.log(tokens);
         } else { // Find the specific user and retrieve their token
           const user = await User.findOne({ _id: selectedUsers });
           if (!user) {
@@ -121,6 +122,7 @@ module.exports={
             body: message
           }
         });
+        console.log('FCM response:', response);
     
         const invalidTokens = [];
         response.responses.forEach((resp, idx) => {
@@ -142,6 +144,7 @@ module.exports={
             }
           });
         }
+       
     
         // Call announce function only if notification is sent successfully
         // announce(req.body);

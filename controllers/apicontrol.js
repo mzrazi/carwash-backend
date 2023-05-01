@@ -10,6 +10,9 @@ var Offer=require('../models/offersmodel');
 const service = require('../models/servicemodel');
 const Appointment = require('../models/appointmentmodel');
 const message = require('../models/messagemodel');
+const moment = require('moment');
+
+
 
 
 
@@ -251,10 +254,12 @@ userSignup: async (req, res) => {
 
    addAppointment : async (req, res) => {
       try {
+        const dateString = req.body.date
+       const localdate=moment(dateString, "DD/MM/YYYY").toDate()
         // create a new appointment object
         const newAppointment = new Appointment({
-          date: req.body.date,
-          time: req.body.time,
+          date:localdate.toLocaleDateString(),
+          timeslot: req.body.timeslot,
           services: req.body.serviceIds, // assuming you have an array of serviceIds in the form data
           userId: req.body.userId,
           specialistId: req.body.specialistId,
@@ -299,11 +304,59 @@ userSignup: async (req, res) => {
   
   
   
+    },
+
+
+    
+
+    bookingpage: async (req, res) => {
+      try {
+        const specialistId = req.body.specialistId;
+    
+        const today = new Date();
+        const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+        const dates = [];
+        const appointmentsByDate = [];
+    
+        // Get the next 7 days' dates
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
+          dates.push(date.toLocaleDateString());
+        }
+        console.log(dates);
+    
+        const appointments = await Appointment.find({
+          specialistId: specialistId,
+          date: { $in: dates }
+        }).exec();
+        console.log(appointments);
+    
+        // Group appointments by date
+        for (const date of dates) {
+          const appointmentsOfDay = appointments.filter(
+            (appointment) => appointment.date === date
+          );
+          const timeSlots = ['9-10', '10-11', '11-12', '12-1', '2-3', '3-4', '4-5', '5-6'];
+    
+          // Remove time slots that have appointments booked
+          appointmentsOfDay.forEach((appointment) => {
+            const index = timeSlots.indexOf(appointment.timeslot);
+            if (index !== -1) {
+              timeSlots.splice(index, 1);
+            }
+          });
+    
+          // Add appointments to the result array
+          appointmentsByDate.push({ date: date, timeSlots: timeSlots });
+        }
+    
+        return res.status(200).json({ message: 'success', appointmentsByDate });
+      } catch (error) {
+        res.status(500).json({ message: 'error', error: error.message });
+      }
     }
     
-  
         
-
 
 
 
