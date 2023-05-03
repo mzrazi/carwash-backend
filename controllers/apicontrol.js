@@ -202,65 +202,78 @@ userSignup: async (req, res) => {
           }
         },
       
-    homepagedata:async(req,res)=>{
-     
-        try {
-          const offers = await Offer.find({});
-          const categories = await Category.find({});
-          const specialists = await Specialist.find({});
-          const contact = await Contact.find({});
-          res.status(200).json({status:200,message:'success' , offers, categories, specialists, contact })
-        } catch (error) {
-          console.error(error);
-          res.status(500).json({ message: 'Error retrieving data' });
-        }
-     
-    },
-
-    servicespage:async(req,res)=>{
-
-      try {
-
-        const categoryId=req.body.categoryId
-        const specialists = await Specialist.find({ categories: categoryId })
-        .populate({ 
-          path: 'categories', 
-          populate: { 
-            path: 'services', 
-          }, 
-          "priority": {
-            "$eq": [
-              "$_id",
-              2
-            ]
+        homepagedata: async (req, res) => {
+          try {
+            const offers = await Offer.find({});
+            offers.forEach((offer) => {
+              offer.imagepath = `https://${process.env.APP_URL}/cwash${offer.imagepath}`;
+            });
+        
+            const categories = await Category.find({});
+            categories.forEach((category) => {
+              category.imagepath = `https://${process.env.APP_URL}/cwash${category.imagepath}`;
+            });
+        
+            const specialists = await Specialist.find({});
+            specialists.forEach((specialist) => {
+              specialist.imagepath = `https://${process.env.APP_URL}/cwash${specialist.imagepath}`;
+            });
+        
+            const contact = await Contact.find({});
+            res.status(200).json({
+              status: 200,
+              message: "success",
+              offers,
+              categories,
+              specialists,
+              contact,
+            });
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Error retrieving data" });
           }
-        })
-        .sort({ categories: 1 })
-        .exec();
-      
-
- 
+        },
         
 
-       
-
-        res.status(200).json({status:200,message:'success' ,specialists })
-
+        servicespage: async (req, res) => {
+          try {
+            const categoryId = req.body.categoryId;
+            const specialists = await Specialist.find({ categories: categoryId })
+              .populate({
+                path: "categories",
+                populate: {
+                  path: "services",
+                },
+              })
+              .exec();
         
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error retrieving data' });
-      }
-    },
-
+            specialists.forEach((specialist) => {
+              specialist.categories.forEach((category) => {
+                console.log(category.imagepath); // Before updating
+                category.imagepath = `https://${process.env.APP_URL}/cwash${category.imagepath}`;
+                console.log(category.imagepath); // After updating
+              });
+              specialist.imagepath = `https://${process.env.APP_URL}/cwash${specialist.imagepath}`;
+              console.log(specialist.imagepath); // After updating
+            });
+        
+            res.status(200).json({ status: 200, message: "success", specialists });
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Error retrieving data" });
+          }
+        },
+        
 
    addAppointment : async (req, res) => {
       try {
-        const dateString = req.body.date
-       const localdate=moment(dateString, "DD/MM/YYYY").toDate()
+        const dateString = new Date(req.body.date)
+
+        console.log(dateString);
+
         // create a new appointment object
         const newAppointment = new Appointment({
-          date:localdate.toLocaleDateString(),
+          date:dateString,
           timeslot: req.body.timeslot,
           services: req.body.serviceIds, // assuming you have an array of serviceIds in the form data
           userId: req.body.userId,
@@ -313,50 +326,55 @@ userSignup: async (req, res) => {
 
     bookingpage: async (req, res) => {
       try {
-        const specialistId = req.body.specialistId;
-    
-        const today = new Date();
-        const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
-        const dates = [];
+        const { specialistId, date } = req.body;
         const appointmentsByDate = [];
-    
-        // Get the next 7 days' dates
-        for (let i = 0; i < 7; i++) {
-          const date = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
-          dates.push(date.toLocaleDateString());
-        }
-        console.log(dates);
-    
+        const dateObj = new Date(date);
+        console.log(dateObj);
+
+      
+
         const appointments = await Appointment.find({
           specialistId: specialistId,
-          date: { $in: dates }
+          date:dateObj 
         }).exec();
+
+
+
+        
+
         console.log(appointments);
+
     
-        // Group appointments by date
-        for (const date of dates) {
-          const appointmentsOfDay = appointments.filter(
-            (appointment) => appointment.date === date
-          );
-          const timeSlots = ['9-10', '10-11', '11-12', '12-1', '2-3', '3-4', '4-5', '5-6'];
+        // Group appointments by timeslot
+        const appointmentsByTimeSlot = {};
+        appointments.forEach((appointment) => {
+          if (!appointmentsByTimeSlot[appointment.timeslot]) {
+            appointmentsByTimeSlot[appointment.timeslot] = [];
+          }
+          appointmentsByTimeSlot[appointment.timeslot].push(appointment);
+        });
     
-          // Remove time slots that have appointments booked
-          appointmentsOfDay.forEach((appointment) => {
-            const index = timeSlots.indexOf(appointment.timeslot);
-            if (index !== -1) {
-              timeSlots.splice(index, 1);
-            }
-          });
+        // Create timeSlots array
+        const timeSlots = ['9-10', '10-11', '11-12', '12-1', '2-3', '3-4', '4-5', '5-6'];
     
-          // Add appointments to the result array
-          appointmentsByDate.push({ date: date, timeSlots: timeSlots });
-        }
+        // Remove time slots that have appointments booked
+        Object.entries(appointmentsByTimeSlot).forEach(([timeslot, appointments]) => {
+          const index = timeSlots.indexOf(timeslot);
+          if (index !== -1) {
+            timeSlots.splice(index, 1);
+          }
+        });
+    
+        // Add appointments to the result array
+        appointmentsByDate.push({ date:date, timeSlots: timeSlots });
     
         return res.status(200).json({ message: 'success', appointmentsByDate });
       } catch (error) {
         res.status(500).json({ message: 'error', error: error.message });
       }
     },
+    
+    
 
  userCancelAppointment:async(req,res)=> {
       try {
@@ -380,16 +398,16 @@ userSignup: async (req, res) => {
         await cancelledAppointment.save();
         await Appointment.findByIdAndDelete(appointmentId);
 
-        const specialist=await Specialist.findById(appointment.specialistId)
-        const tokens=specialist.tokens
-        const response = await admin.messaging().sendMulticast({
-          tokens,
-          notification: {
-            title:' cancelled ',
-            body: 'appointment cancelled by user because of' +reason
-          }
-        });
-        console.log('FCM response:', response);
+        // const specialist=await Specialist.findById(appointment.specialistId)
+        // const tokens=specialist.tokens
+        // const response = await admin.messaging().sendMulticast({
+        //   tokens,
+        //   notification: {
+        //     title:' cancelled ',
+        //     body: 'appointment cancelled by user because of' +reason
+        //   }
+        // });
+        // console.log('FCM response:', response);
 
 
         
@@ -423,16 +441,16 @@ userSignup: async (req, res) => {
         await cancelledAppointment.save();
         await Appointment.findByIdAndDelete(appointmentId);
 
-        const user=await User.findById(appointment.userId)
-        const tokens=user.tokens
-        const response = await admin.messaging().sendMulticast({
-          tokens,
-          notification: {
-            title:' cancelled ',
-            body: 'appointment cancelled by specialist because of' +reason
-          }
-        });
-        console.log('FCM response:', response);
+        // const user=await User.findById(appointment.userId)
+        // const tokens=user.tokens
+        // const response = await admin.messaging().sendMulticast({
+        //   tokens,
+        //   notification: {
+        //     title:' cancelled ',
+        //     body: 'appointment cancelled by specialist because of' +reason
+        //   }
+        // });
+        // console.log('FCM response:', response);
 
 
         
@@ -446,47 +464,50 @@ userSignup: async (req, res) => {
 
 
     addreview:async(req,res)=>{
-      const { appointmentId, review, reliability, tidiness, response, accuracy, pricing, rating,complete,recommendation} = req.body;
+      const { appointmentId, review, reliability, tidiness, response, accuracy, pricing, rating, complete,recommendation} = req.body;
       try {
-        const newReview = new Review({ appointmentId, review, reliability, tidiness, response, accuracy, pricing, rating, complete,recommendation});
+    
+        const appointment=await  CompletedAppointment.findById(appointmentId)
+        if(!appointment){
+          return res.status(404).json({message:"not found"})
+        }
+        console.log(appointment);
+    
+        if(!appointment.userId || !appointment.specialistId) {
+          return res.status(400).json({ message: "Missing userId or specialistId in appointment" });
+        }
+    
+        const existingReview = await Review.findOne({ appointmentId });
+        if(existingReview) {
+          return res.status(400).json({ message: "A review has already been submitted for this appointment" });
+        }
+    
+        const {userId,specialistId}=appointment
+        const newReview = new Review({userId,specialistId, appointmentId, review, reliability, tidiness, response, accuracy, pricing, rating, complete,recommendation});
         const savedReview = await newReview.save();
+        const specialist=await Specialist.findById(specialistId)
+        const reviewId = savedReview._id
+        specialist.reviews.push(reviewId)
+        await specialist.save();
+
+
         res.status(201).json(savedReview);
       } catch (err) {
         res.status(400).json({ message: err.message });
       }
-
-    },
-    editProfile: async (req, res) => {
-      try {
-        // Find user by id
-        var updates = req.body;
-        console.log(updates);
-        var ID= req.body.userId
     
-        const user = await User.findById(ID)
-        if (!user) {
-          return res.status(404).json({status:404, message: "user not found" });
-        }
-    
-        // Update user details
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: ID },
-          { $set:updates},
-          { new: true }
-        );
-    
-        return res.status(200).json({status:200, message: "Profile updated successfully",updatedUser});
-      } catch (error) {
-        console.error(error);
-        return  res.status(500).json({status:500,message:"error updating profile",err:error});
-      }
     },
     
+  
     userdetails:async (req,res)=>{
       try {
         var id = req.body.userId
       
      const user= await User.findById(id).exec()
+    
+      user.imagepath = `https://${process.env.APP_URL}/cwash${user.imagepath}`;
+    
+
      console.log(user);
      if (!user) {
       return res.status(404).json({status:404, message: "User not found" });
@@ -502,7 +523,7 @@ userSignup: async (req, res) => {
     completedjob:async(req,res)=>{
       try {
 
-        const [appointmentId]=req.body
+        const {appointmentId}=req.body
         const appointment = await Appointment.findById(appointmentId)
         if (!appointment) {
           throw new Error('Appointment not found');
@@ -520,15 +541,15 @@ userSignup: async (req, res) => {
         await Appointment.findByIdAndDelete(appointmentId);
 
         const user=await User.findById(appointment.userId)
-        const tokens=user.tokens
-        const response = await admin.messaging().sendMulticast({
-          tokens,
-          notification: {
-            title:' completed ',
-            body: 'job completed'
-          }
-        });
-        console.log('FCM response:', response);
+        // const tokens=user.tokens
+        // const response = await admin.messaging().sendMulticast({
+        //   tokens,
+        //   notification: {
+        //     title:' completed ',
+        //     body: 'job completed'
+        //   }
+        // });
+        // console.log('FCM response:', response);
 
 
         

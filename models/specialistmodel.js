@@ -15,6 +15,13 @@ const specialistSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  reviews:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Review',
+      required: true,
+    }
+  ]
 });
 
 

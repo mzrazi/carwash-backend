@@ -53,7 +53,7 @@ router.get('/', function(req, res, next) {
 
 router.post('/add-offers',uploadOffers.single('image'),async(req,res)=>{
 var newoffer= new Offer({
-  imagepath:`${process.env.APP_URL}/cwash/images/offers/${req.file.filename}`
+  imagepath:`/images/offers/${req.file.filename}`
 })
  try { 
  await newoffer.save() 
@@ -74,7 +74,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
   var data=req.body
   var newcategory= new Category({
     title:data.title,
-    imagepath:`${process.env.APP_URL}/cwash/images/categories/${req.file.filename}`
+    imagepath:`/images/categories/${req.file.filename}`
   })
    try { 
    await newcategory.save() 
@@ -96,7 +96,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
     var newspecialist= new specialist({
       name:data.name,
       categories:data.categoryIds,
-      imagepath:`${process.env.APP_URL}/cwash/images/specialists/${req.file.filename}`
+      imagepath:`/images/specialists/${req.file.filename}`
     })
      try { 
      await newspecialist.save() 

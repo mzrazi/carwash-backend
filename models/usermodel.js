@@ -9,6 +9,7 @@ const userSchema = new Schema({
     Phone: { type:String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    imagepath:{type:String },
     resetToken:{ type:String },
     resetTokenExpiration:{type:String},
     emailverified: { type: Boolean, default: false},

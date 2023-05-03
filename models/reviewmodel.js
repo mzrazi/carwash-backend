@@ -7,15 +7,16 @@ var reviewSchema = new mongoose.Schema({
         required:true,
         unique:true,
     },
-    userId:{
-        type:String,
-        required:true,
-       
-    },
-    specialistId:{
-        type:String,
-        required:true,
-    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
+      specialistId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Specialist',
+        required: true,
+      },
    recommendation:{
         type:String,
         enum:['yes','no']
@@ -53,8 +54,8 @@ var reviewSchema = new mongoose.Schema({
         default:'N/a'
         
     },rating:{
-        type:String,
-        enum: ['1', '2','3','4','5'],
+        type:Number,
+        enum: [1,2,3,4,5],
 
         
     },
