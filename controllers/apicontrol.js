@@ -563,10 +563,10 @@ userSignup: async (req, res) => {
     },
 
 
-   getAppointmentHistory: async (req,res) => {
+    getAppointmentHistory: async (req, res) => {
       try {
-
-        const userId=req.body.userId
+        const userId = req.body.userId;
+    
         const upcomingAppointments = await Appointment.find({ userId: userId, status: 'booked' })
           .populate('services specialistId')
           .sort({ date: 1 });
@@ -579,12 +579,28 @@ userSignup: async (req, res) => {
           .populate('services specialistId')
           .sort({ date: -1 });
     
+        // Add the app-url/cwash to the specialist imagepath
+        upcomingAppointments.forEach((appointment) => {
+          appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+
+        });
+    
+        cancelledAppointments.forEach((appointment) => {
+          appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+        });
+    
+        completedAppointments.forEach((appointment) => {
+          appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+          
+        });
+    
         return res.status(200).json({ upcoming: upcomingAppointments, history: [...cancelledAppointments, ...completedAppointments] });
       } catch (err) {
-        res.status(500).json({message:'error',err})
+        res.status(500).json({ message: 'error', err });
         console.error(err);
       }
     }
+    
     
     
     
