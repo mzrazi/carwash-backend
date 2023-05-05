@@ -171,8 +171,9 @@ module.exports={
             message: 'User not found'
           });
         } else {
+          console.log(error)
           res.status(500).json({
-            error: 'Internal server error',
+           
             message: 'An internal server error occurred',
             error
           });
