@@ -15,7 +15,8 @@ const {
     addreview,
     getAppointmentHistory,
     getAllNotifications,
-    unreviewed
+    unreviewed,
+    specialistreviews
 } = require('../controllers/apicontrol');
 var router = express.Router();
 const multer=require('multer')
@@ -86,6 +87,7 @@ router.post('/add-review',addreview)
 router.post('/get-appointments',getAppointmentHistory)
 router.post('/user-notifications',getAllNotifications)
 router.post('/review-page',unreviewed)
+router.post('/specialist-reviews',specialistreviews)
 
 module.exports = router;
 

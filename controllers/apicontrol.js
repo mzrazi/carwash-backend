@@ -17,6 +17,7 @@ const admin = require('firebase-admin');
 const CompletedAppointment = require('../models/completedappointment');
 const notificationmodel = require('../models/notificationmodel');
 const completedappointment = require('../models/completedappointment');
+const review = require('../models/reviewmodel');
 
 
 
@@ -652,6 +653,22 @@ userSignup: async (req, res) => {
         
       }
 
+    },
+
+    specialistreviews: async (req, res) => {
+      const { id } = req.body;
+      try {
+        const reviews = await review.find({ specialisId: id }).sort({ createdAt: -1 }).exec();
+        const reviewCount = reviews.length;
+        let ratingSum = 0;
+        for (let i = 0; i < reviewCount; i++) {
+          ratingSum += reviews[i].rating;
+        }
+        const averageRating = reviewCount > 0 ? ratingSum / reviewCount : 0;
+        res.status(200).json({ message: 'success', reviews, averageRating });
+      } catch (error) {
+        res.status(500).json({ message: 'error', error });
+      }
     }
     
     
