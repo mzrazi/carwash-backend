@@ -173,7 +173,8 @@ module.exports={
         } else {
           res.status(500).json({
             error: 'Internal server error',
-            message: 'An internal server error occurred'
+            message: 'An internal server error occurred',
+            error
           });
         }
       }
