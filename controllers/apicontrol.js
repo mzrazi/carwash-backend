@@ -624,7 +624,7 @@ userSignup: async (req, res) => {
           return res.status(404).json({ success: false, message: 'notifications not found for user' });
         }
     
-        return res.status(200).json({ success: true, data: announcements });
+        return res.status(200).json({ success: true, data: Notifications});
       } catch (error) {
         console.error(error);
         return res.status(500).json({ success: false, message: 'Error fetching notifications' });
