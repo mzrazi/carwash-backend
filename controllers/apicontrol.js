@@ -15,6 +15,8 @@ const CancelledAppointment = require('../models/cancelledappointmentmodel');
 const Review = require('../models/reviewmodel');
 const admin = require('firebase-admin');
 const CompletedAppointment = require('../models/completedappointment');
+const notificationmodel = require('../models/notificationmodel');
+const completedappointment = require('../models/completedappointment');
 
 
 
@@ -531,7 +533,7 @@ userSignup: async (req, res) => {
         const {appointmentId}=req.body
         const appointment = await Appointment.findById(appointmentId)
         if (!appointment) {
-          throw new Error('Appointment not found');
+        return res.status(404).json({message:'Appointment not found'});
         }
         const completedAppointment = new CompletedAppointment({
           date: appointment.date,
@@ -541,6 +543,7 @@ userSignup: async (req, res) => {
           specialistId: appointment.specialistId,
           totalAmount: appointment.totalAmount,
           totalDuration: appointment.totalDuration,
+          paid:appointment.paid
         });
         await completedAppointment.save();
         await Appointment.findByIdAndDelete(appointmentId);
@@ -604,7 +607,53 @@ userSignup: async (req, res) => {
         res.status(500).json({ message: 'error', err });
         console.error(err);
       }
+    },
+
+
+    getAllNotifications:async(req,res)=>{
+  
+      const { userId } = req.body;
+    
+      try {
+        const Notifications= await notificationmodel
+          .find({ $or: [{ user: userId }, { user: 'all' }] })
+          .sort({ createdAt: -1 })
+          .exec();
+    
+        if (announcements.length === 0) {
+          return res.status(404).json({ success: false, message: 'notifications not found for user' });
+        }
+    
+        return res.status(200).json({ success: true, data: announcements });
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: 'Error fetching notifications' });
+      }
+    },
+
+    unreviewed:async(req,res)=>{
+
+      try {
+
+        const {userId}=req.body
+
+        const appointments=await completedappointment.find({userId:userId,reviewed:false})
+
+        if(!appointments){
+          return res.status(404).json({message:'not found'})
+        }
+
+        return res.status(200).json({message:'success',appointments})
+        
+      } catch (error) {
+        console.log(error);
+        return res.status(500).json({message:'error',error})
+        
+        
+      }
+
     }
+    
     
     
     

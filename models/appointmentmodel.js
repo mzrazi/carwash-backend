@@ -33,6 +33,12 @@ const appointmentSchema = new mongoose.Schema({
     required: true,
   },
 
+  paid:{
+
+    type:Boolean,
+    default:false
+  },
+
   status:{
     type:String,
     required:true,

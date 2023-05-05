@@ -32,6 +32,10 @@ const completedAppointmentSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  paid:{
+    type:Boolean,
+    default:false
+  },
   reviewed:{
     type:Boolean,
   default:false,
