@@ -106,13 +106,13 @@ module.exports={
         } else { // Find the specific user and retrieve their token
           const user = await User.findOne({ _id: selectedUsers });
           if (!user) {
-            throw new Error('User not found');
+          return res.status(400).json({message:'User not found'});
           }
           tokens = user.tokens;
         }
     
         if (tokens.length === 0) {
-          throw new Error('No valid tokens found');
+          return res.status(400).json({message:'no valid tokens found'});
         }
     
       
@@ -148,7 +148,9 @@ module.exports={
        
     
         // Call announce function only if notification is sent successfully
-      this.savenotification(req.body);
+    savenotification(req.body);
+
+
     
         // Send JSON response if notification sent successfully
         res.json({
