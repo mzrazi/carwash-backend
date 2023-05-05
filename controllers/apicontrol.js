@@ -620,7 +620,7 @@ userSignup: async (req, res) => {
           .sort({ createdAt: -1 })
           .exec();
     
-        if (announcements.length === 0) {
+        if (Notifications.length === 0) {
           return res.status(404).json({ success: false, message: 'notifications not found for user' });
         }
     
