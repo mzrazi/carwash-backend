@@ -5,10 +5,10 @@ const completedAppointmentSchema = new mongoose.Schema({
     type:Date,
     required: true,
   },
-  timeslot: [{
+  timeslot: {
     type: String,
     required: true,
-  }],
+  },
   services: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Service',
