@@ -1,5 +1,6 @@
 const Category = require('../models/categorymodel');
 const Contact = require('../models/contactmodel');
+const notificationmodel = require('../models/notificationmodel');
 const service = require('../models/servicemodel');
 const User = require('../models/usermodel');
 const admin = require('firebase-admin');
@@ -21,11 +22,11 @@ module.exports={
             contact.phoneNumber = phoneNumber;
             contact.whatsappNumber = whatsappNumber;
             await contact.save();
-            res.status(200).json({ message: 'Contact information updated successfully.' });
+            res.status(200).json({ message: 'Contact information updated successfully.',contact });
           } else {
             contact = new Contact({ phoneNumber, whatsappNumber });
             await contact.save();
-            res.status(200).json({ message: 'Contact information added successfully.' });
+            res.status(200).json({ message: 'Contact information added successfully.',contact });
           }
         } catch (error) {
           res.status(500).json({ message:error ,errmessage: 'Failed to save contact information.' });
@@ -71,15 +72,15 @@ module.exports={
       }
     },
     
-    announce:(data)=>{
+   savenotification:(data)=>{
     
       const { title, message,selectedUsers} = data;
   
     // Create a new document using the model
-    const newAnnounce = new announcemodel({ title, message,user:selectedUsers });
+    const newNotification = new notificationmodel({ title, message,user:selectedUsers });
   
     // Save the document to the database
-    newAnnounce.save((err) => {
+    newNotification.save((err) => {
       if (err) {
         // Handle any validation errors
         const validationErrors = Object.values(err.errors).map(error => error.message);
@@ -147,7 +148,7 @@ module.exports={
        
     
         // Call announce function only if notification is sent successfully
-        // announce(req.body);
+      this.savenotification(req.body);
     
         // Send JSON response if notification sent successfully
         res.json({

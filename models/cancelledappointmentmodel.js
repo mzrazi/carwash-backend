@@ -5,10 +5,10 @@ const cancelledAppointmentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  timeslot: {
+  timeslot: [{
     type: String,
     required: true,
-  },
+  }],
   services: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Service',

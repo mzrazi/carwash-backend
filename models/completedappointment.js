@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const completedAppointmentSchema = new mongoose.Schema({
   date: {
-    type: String,
+    type:Date,
     required: true,
   },
-  timeslot: {
+  timeslot: [{
     type: String,
     required: true,
-  },
+  }],
   services: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Service',
@@ -31,6 +31,11 @@ const completedAppointmentSchema = new mongoose.Schema({
   totalDuration: {
     type: Number,
     required: true,
+  },
+  reviewed:{
+    type:Boolean,
+  default:false,
+  required:true
   }
 })
 

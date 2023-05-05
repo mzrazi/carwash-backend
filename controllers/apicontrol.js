@@ -308,7 +308,7 @@ userSignup: async (req, res) => {
       try {
         
         newmessage.save().then((doc)=>{
-          res.status(200).json({status:200,message:"succesfull"})
+          res.status(200).json({status:200,message:"succesfull",newmessage})
         }).catch((err)=>{
           res.status(404).json({status:404,message:err.message})
         })
@@ -355,7 +355,7 @@ userSignup: async (req, res) => {
         });
     
         // Create timeSlots array
-        const timeSlots = ['9-10', '10-11', '11-12', '12-1', '2-3', '3-4', '4-5', '5-6'];
+        const timeSlots = ['9-10', '10-11', '11-12', '12-1','1-2', '2-3', '3-4', '4-5', '5-6'];
     
         // Remove time slots that have appointments booked
         Object.entries(appointmentsByTimeSlot).forEach(([timeslot, appointments]) => {
@@ -411,7 +411,7 @@ userSignup: async (req, res) => {
 
 
         
-        return res.status(200).json({message:'success'})
+        return res.status(200).json({message:'success',cancelledAppointment})
       } catch (err) {
         res.status(500).json({message:'error',err})
         console.error(err);
@@ -454,7 +454,7 @@ userSignup: async (req, res) => {
 
 
         
-        return res.status(200).json({message:'success'})
+        return res.status(200).json({message:'success',cancelledAppointment})
       } catch (err) {
         res.status(500).json({message:'error',err})
         console.error(err);
@@ -489,9 +489,14 @@ userSignup: async (req, res) => {
         const reviewId = savedReview._id
         specialist.reviews.push(reviewId)
         await specialist.save();
+        await CompletedAppointment.findByIdAndUpdate(
+          appointmentId,
+          { reviewed: true },
+          { new: true }
+        );
 
 
-        res.status(201).json(savedReview);
+        res.status(201).json({message:'done',savedReview});
       } catch (err) {
         res.status(400).json({ message: err.message });
       }
@@ -562,7 +567,6 @@ userSignup: async (req, res) => {
 
     },
 
-
     getAppointmentHistory: async (req, res) => {
       try {
         const userId = req.body.userId;
@@ -582,16 +586,17 @@ userSignup: async (req, res) => {
         // Add the app-url/cwash to the specialist imagepath
         upcomingAppointments.forEach((appointment) => {
           appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-
+          appointment.date=new Date(appointment.date).getTime()
         });
     
         cancelledAppointments.forEach((appointment) => {
           appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+          appointment.date = new Date(appointment.date).toLocaleDateString();
         });
     
         completedAppointments.forEach((appointment) => {
           appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-          
+          appointment.date = new Date(appointment.date).toLocaleDateString();
         });
     
         return res.status(200).json({ upcoming: upcomingAppointments, history: [...cancelledAppointments, ...completedAppointments] });

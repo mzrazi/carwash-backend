@@ -8,7 +8,7 @@ const {
     addAppointment,
     savemessage,
     bookingpage,
-    editProfile,
+   
     userdetails,
     userCancelAppointment,
     completedjob,

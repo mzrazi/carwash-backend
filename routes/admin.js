@@ -78,7 +78,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
   })
    try { 
    await newcategory.save() 
-    res.status(200).json({message:'done'})
+    res.status(200).json({message:'done',newcategory})
   } catch (error) {
     fs.unlink(req.file.path, (err) => {
       if (err) console.log(err);
@@ -106,7 +106,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
         if (err) console.log(err);
         console.log(`${req.file.path} was deleted`);
       });
-      res.status(500).json({message:error})
+      res.status(500).json({message:error,newspecialist})
     }
     
     }) 
