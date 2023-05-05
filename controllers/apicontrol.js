@@ -638,7 +638,7 @@ userSignup: async (req, res) => {
 
         const {userId}=req.body
 
-        const appointments=await completedappointment.find({userId:userId,reviewed:false})
+        const appointments=await completedappointment.find({userId:userId,reviewed:false}).populate('specialistId').exec()
 
         if(!appointments){
           return res.status(404).json({message:'not found'})
