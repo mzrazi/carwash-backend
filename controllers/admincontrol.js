@@ -147,10 +147,11 @@ module.exports={
         }
        
     
-        // Call announce function only if notification is sent successfully
-    savenotification(req.body);
-
-
+        const newNotification = new notificationmodel({ title, message,user:selectedUsers });
+  
+    // Save the document to the database
+    newNotification.save()
+     
     
         // Send JSON response if notification sent successfully
         res.json({
