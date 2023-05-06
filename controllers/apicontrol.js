@@ -587,21 +587,31 @@ userSignup: async (req, res) => {
           .populate('services specialistId')
           .sort({ date: -1 });
     
-        // Add the app-url/cwash to the specialist imagepath
-        upcomingAppointments.forEach((appointment) => {
-          appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-          appointment.date=new Date(appointment.date).getTime()
-        });
-    
-        cancelledAppointments.forEach((appointment) => {
-          appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-          appointment.date = new Date(appointment.date).toLocaleDateString();
-        });
-    
-         completedAppointments.forEach((appointment) => { console.log(appointment.specialistId.imagepath);
-          appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-          appointment.date = new Date(appointment.date).toLocaleDateString();
-        });
+          upcomingAppointments.forEach((appointment) => {
+            if (!appointment.processed) {
+              appointment.specialistId.imagepath = `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+              appointment.date=new Date(appointment.date).getTime();
+              appointment.processed = true;
+            }
+          });
+          
+          cancelledAppointments.forEach((appointment) => {
+            if (!appointment.processed) {
+              appointment.specialistId.imagepath = `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+              appointment.date = new Date(appointment.date).toLocaleDateString();
+              appointment.processed = true;
+            }
+          });
+          
+          completedAppointments.forEach((appointment) => {
+            if (!appointment.processed) {
+              console.log(appointment.specialistId.imagepath);
+              appointment.specialistId.imagepath = `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
+              appointment.date = new Date(appointment.date).toLocaleDateString();
+              appointment.processed = true;
+            }
+          });
+          
     
         return res.status(200).json({ upcoming: upcomingAppointments, history: [...cancelledAppointments, ...completedAppointments] });
       } catch (err) {
