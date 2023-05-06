@@ -270,17 +270,18 @@ userSignup: async (req, res) => {
 
    addAppointment : async (req, res) => {
       try {
-        const dateString = new Date(req.body.date)
+        const timestamp = req.body.date; // Unix timestamp in seconds
+const date = new Date(timestamp * 1000); // convert to milliseconds
+console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Daylight Time)
 
-        console.log(dateString);
 
         // create a new appointment object
         const newAppointment = new Appointment({
-          date:dateString,
+          date:date,
           timeslot: req.body.timeslot,
-          services: req.body.serviceIds, // assuming you have an array of serviceIds in the form data
-          userId: req.body.userId,
-          specialistId: req.body.specialistId,
+          services: req.body.serviceId, // assuming you have an array of serviceIds in the form data
+          user: req.body.userId,
+          specialist: req.body.specialistId,
           totalAmount: req.body.totalAmount,
           totalDuration: req.body.totalDuration,
         });
@@ -324,29 +325,25 @@ userSignup: async (req, res) => {
   
     },
 
-
-    
-
     bookingpage: async (req, res) => {
       try {
         const { specialistId, date } = req.body;
+        const timestamp = req.body.date; // Unix timestamp in seconds
+        const dateObj = new Date(timestamp * 1000);
         const appointmentsByDate = [];
-        const dateObj = new Date(date);
-        console.log(dateObj);
-
-      
-
+    
+        // Create start and end of day
+        const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+    
+        // Find all appointments for the day
         const appointments = await Appointment.find({
           specialistId: specialistId,
-          date:dateObj 
+          date: {
+            $gte: startOfDay,
+            $lt: endOfDay
+          }
         }).exec();
-
-
-
-        
-
-        console.log(appointments);
-
     
         // Group appointments by timeslot
         const appointmentsByTimeSlot = {};
@@ -358,7 +355,7 @@ userSignup: async (req, res) => {
         });
     
         // Create timeSlots array
-        const timeSlots = ['9-10', '10-11', '11-12', '12-1','1-2', '2-3', '3-4', '4-5', '5-6'];
+        const timeSlots = ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm', '4pm', '5pm', '6pm'];
     
         // Remove time slots that have appointments booked
         Object.entries(appointmentsByTimeSlot).forEach(([timeslot, appointments]) => {
@@ -368,14 +365,33 @@ userSignup: async (req, res) => {
           }
         });
     
+        // // Remove past timeslots for the current day
+        // const now = new Date();
+        // const currentHour = now.getHours();
+        // const today = new Date().setHours(0, 0, 0, 0);
+        // if (timestamp * 1000 >= today) {
+        //   const pastTimeSlots = timeSlots.slice(0, currentHour - 8);
+        //   pastTimeSlots.forEach((timeslot) => {
+        //     const index = timeSlots.indexOf(timeslot);
+        //     if (index !== -1) {
+        //       timeSlots.splice(index, 1);
+        //     }
+        //   });
+        // }
+    
         // Add appointments to the result array
-        appointmentsByDate.push({ date:date, timeSlots: timeSlots });
+        appointmentsByDate.push({ date: timestamp, timeSlots: timeSlots });
     
         return res.status(200).json({ message: 'success', appointmentsByDate });
       } catch (error) {
         res.status(500).json({ message: 'error', error: error.message });
       }
-    },
+    }
+    ,
+    
+    
+    
+    
     
     
 
@@ -540,8 +556,8 @@ userSignup: async (req, res) => {
           date: appointment.date,
           timeslot: appointment.timeslot,
           services: appointment.services,
-          userId: appointment.userId,
-          specialistId: appointment.specialistId,
+          userId: appointment.user,
+          specialistId: appointment.specialist,
           totalAmount: appointment.totalAmount,
           totalDuration: appointment.totalDuration,
           paid:appointment.paid
@@ -571,54 +587,34 @@ userSignup: async (req, res) => {
 
     },
 
-    getAppointmentHistory: async (req, res) => {
-      try {
-        const userId = req.body.userId;
-    
-        const upcomingAppointments = await Appointment.find({ userId: userId, status: 'booked' })
-          .populate('services specialistId')
-          .sort({ date: 1 });
-    
-        const cancelledAppointments = await CancelledAppointment.find({ userId: userId })
-          .populate('services specialistId')
-          .sort({ date: -1 });
-    
-        const completedAppointments = await CompletedAppointment.find({ userId: userId })
-          .populate('services specialistId')
-          .sort({ date: -1 });
-    
-          upcomingAppointments.forEach((appointment) => {
-            if (!appointment.processed) {
-              appointment.specialistId.imagepath = `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-              appointment.date=new Date(appointment.date).getTime();
-              appointment.processed = true;
-            }
-          });
+    getupcomingappointments:async(req,res)=>{
+      try{
+
+        const userId=req.body.userId
+        const upcomingAppointments = await Appointment.find({
+          userId:userId,
+        status: 'booked' })
+        .populate('userId')
+        .populate('services')
+        .populate('specialistId');
+        
+        
+        if (upcomingAppointments.length === 0) {
+          return res.status(404).json({ message: 'No upcoming appointments found' });
+        }
+
+        upcomingAppointments.forEach(appointment=>{
           
-          cancelledAppointments.forEach((appointment) => {
-            if (!appointment.processed) {
-              appointment.specialistId.imagepath = `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-              appointment.date = new Date(appointment.date).toLocaleDateString();
-              appointment.processed = true;
-            }
-          });
-          
-          completedAppointments.forEach((appointment) => {
-            if (!appointment.processed) {
-              console.log(appointment.specialistId.imagepath);
-              appointment.specialistId.imagepath = `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
-              appointment.date = new Date(appointment.date).toLocaleDateString();
-              appointment.processed = true;
-            }
-          });
-          
-    
-        return res.status(200).json({ upcoming: upcomingAppointments, history: [...cancelledAppointments, ...completedAppointments] });
-      } catch (err) {
-        res.status(500).json({ message: 'error', err });
-        console.error(err);
-      }
-    },
+          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash/${appointment.specialistId.imagepath}`
+         
+        })
+      
+        
+        return res.status(200).json({ message: 'success', appointments:upcomingAppointments });
+      } catch (error) {
+        return res.status(500).json({ message: 'Error finding appointments', error: error.message });
+      }}
+      ,
 
 
     getAllNotifications:async(req,res)=>{
@@ -648,7 +644,7 @@ userSignup: async (req, res) => {
 
         const {userId}=req.body
 
-        const appointments=await completedappointment.find({userId:userId,reviewed:false}).populate('specialistId').exec()
+        const appointments=await completedappointment.find({userId:userId,reviewed:false}).populate('specialistId serviceid').exec()
 
         if(!appointments){
           return res.status(404).json({message:'not found'})
@@ -676,7 +672,7 @@ userSignup: async (req, res) => {
           ratingSum += review.rating;
           // Modify the imagePath property of each user object in the reviews array
           if (review.userId) {
-            review.userId.imagepath = `${process.env.APP_URL}/cwash/${review.userId.imagepath}`;
+            review.userId.imagepath = `${process.env.APP_URL}/cwash${review.userId.imagepath}`;
           }
         });
         
@@ -684,6 +680,38 @@ userSignup: async (req, res) => {
         res.status(200).json({ message: 'success', reviews, averageRating });
       } catch (error) {
         res.status(500).json({ message: 'error', error });
+      }
+    },
+
+    gethistoryappointments:async(req,res)=>{
+      try {
+        const { userId } = req.params;
+    
+        const cancelledAppointments = await CancelledAppointment.find({ user: userId }).populate('userId')
+        .populate('services')
+        .populate('specialistId');;
+        cancelledAppointments.forEach(appointment=>{
+          
+          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
+         
+        })
+      
+        const completedAppointments = await CompletedAppointment.find({ user: userId }).populate('userId')
+        .populate('services')
+        .populate('specialistId');
+       completedAppointments.forEach(appointment=>{
+          
+          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
+         
+        })
+      
+    
+        const history = [...cancelledAppointments, ...completedAppointments];
+    
+        res.json({ history });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Something went wrong.' });
       }
     }
     
