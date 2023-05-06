@@ -556,8 +556,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           date: appointment.date,
           timeslot: appointment.timeslot,
           services: appointment.services,
-          userId: appointment.user,
-          specialistId: appointment.specialist,
+          userId: appointment.userId,
+          specialistId: appointment.specialistId,
           totalAmount: appointment.totalAmount,
           totalDuration: appointment.totalDuration,
           paid:appointment.paid
