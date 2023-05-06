@@ -598,7 +598,7 @@ userSignup: async (req, res) => {
           appointment.date = new Date(appointment.date).toLocaleDateString();
         });
     
-        completedAppointments.forEach((appointment) => {
+         completedAppointments.forEach((appointment) => { console.log(appointmeent.specialisI.imagepath);
           appointment.specialistId.imagepath = `https://${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`;
           appointment.date = new Date(appointment.date).toLocaleDateString();
         });
