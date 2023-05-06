@@ -605,7 +605,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
 
         upcomingAppointments.forEach(appointment=>{
           
-          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash/${appointment.specialistId.imagepath}`
+          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
          
         })
       
@@ -645,6 +645,11 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const {userId}=req.body
 
         const appointments=await completedappointment.find({userId:userId,reviewed:false}).populate('specialistId services').exec()
+        appointments.forEach(appointment=>{
+          
+          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
+         
+        })
 
         if(!appointments){
           return res.status(404).json({message:'not found'})
