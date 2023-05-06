@@ -280,8 +280,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           date:date,
           timeslot: req.body.timeslot,
           services: req.body.serviceId, // assuming you have an array of serviceIds in the form data
-          user: req.body.userId,
-          specialist: req.body.specialistId,
+          userId: req.body.userId,
+          specialistId: req.body.specialistId,
           totalAmount: req.body.totalAmount,
           totalDuration: req.body.totalDuration,
         });
