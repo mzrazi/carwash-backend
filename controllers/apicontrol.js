@@ -209,17 +209,17 @@ userSignup: async (req, res) => {
           try {
             const offers = await Offer.find({});
             offers.forEach((offer) => {
-              offer.imagepath = `https://${process.env.APP_URL}/cwash${offer.imagepath}`;
+              offer.imagepath = `${process.env.APP_URL}/cwash${offer.imagepath}`;
             });
         
             const categories = await Category.find({});
             categories.forEach((category) => {
-              category.imagepath = `https://${process.env.APP_URL}/cwash${category.imagepath}`;
+              category.imagepath = `${process.env.APP_URL}/cwash${category.imagepath}`;
             });
         
             const specialists = await Specialist.find({});
             specialists.forEach((specialist) => {
-              specialist.imagepath = `https://${process.env.APP_URL}/cwash${specialist.imagepath}`;
+              specialist.imagepath = `${process.env.APP_URL}/cwash${specialist.imagepath}`;
             });
         
             const contact = await Contact.find({});
@@ -253,10 +253,10 @@ userSignup: async (req, res) => {
             specialists.forEach((specialist) => {
               specialist.categories.forEach((category) => {
                 console.log(category.imagepath); // Before updating
-                category.imagepath = `https://${process.env.APP_URL}/cwash${category.imagepath}`;
+                category.imagepath = `${process.env.APP_URL}/cwash${category.imagepath}`;
                 console.log(category.imagepath); // After updating
               });
-              specialist.imagepath = `https://${process.env.APP_URL}/cwash${specialist.imagepath}`;
+              specialist.imagepath = `${process.env.APP_URL}/cwash${specialist.imagepath}`;
               console.log(specialist.imagepath); // After updating
             });
         
