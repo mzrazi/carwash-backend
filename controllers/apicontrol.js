@@ -414,8 +414,18 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           reason:reason,
           cancelledby:'user'
         });
-        await cancelledAppointment.save();
-        await Appointment.findByIdAndDelete(appointmentId);
+        const cancelled =await cancelledAppointment.save();
+        if(!cancelled){
+          return res.status(500).json({status:500 ,message:'cancellation error'})
+        }
+        const deleted=await Appointment.findByIdAndDelete(appointmentId);
+
+        if(!deleted){
+          cancelledAppointment.deleteOne()
+
+          return res.status(500).json({status:500 ,message:'cancellation error'})
+
+        }
 
         // const specialist=await Specialist.findById(appointment.specialistId)
         // const tokens=specialist.tokens
@@ -433,8 +443,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         return res.status(200).json({message:'success',cancelledAppointment})
       } catch (err) {
         res.status(500).json({message:'error',err})
-        console.error(err);
-        throw err;
+        
+       
       }
     },
     
@@ -604,14 +614,6 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         if (upcomingAppointments.length === 0) {
           return res.status(404).json({ message: 'No upcoming appointments found' });
         }
-
-        upcomingAppointments.forEach((appointment)=>{
-          appointment.specialistId = { ...appointment.specialistId, imagepath: `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}` };
-        })
-        
-        
-       
-      
         
         return res.status(200).json({ message: 'success', appointments:upcomingAppointments });
       } catch (error) {
@@ -698,20 +700,11 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const cancelledAppointments = await CancelledAppointment.find({ user: userId }).populate('userId')
         .populate('services')
         .populate('specialistId');;
-        cancelledAppointments.forEach(appointment=>{
-          
-          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
-         
-        })
+     
       
         const completedAppointments = await CompletedAppointment.find({ user: userId }).populate('userId')
         .populate('services')
         .populate('specialistId');
-       completedAppointments.forEach(appointment=>{
-          
-          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
-         
-        })
       
     
         const history = [...cancelledAppointments, ...completedAppointments];
