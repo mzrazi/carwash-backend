@@ -592,18 +592,20 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
 
         const userId=req.body.userId
         const upcomingAppointments = await Appointment.find({
-          userId:userId,
-        status: 'booked' })
+          userId: userId,
+          status: 'booked'
+        })
         .populate('userId')
         .populate('services')
-        .populate('specialistId');
+        .populate('specialistId')
+        .lean();
         
         
         if (upcomingAppointments.length === 0) {
           return res.status(404).json({ message: 'No upcoming appointments found' });
         }
 
-        upcomingAppointments.forEach(appointment=>{
+        upcomingAppointments.forEach((appointment)=>{
           
           appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
          
@@ -718,7 +720,106 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         console.error(error);
         res.status(500).json({ message: 'Something went wrong.' });
       }
+    },
+
+
+
+     findAppointments:async (req, res) => {
+      try {
+        const specialistId = req.body.specialistId;
+        const timestamp = req.body.date; // Unix timestamp in seconds
+        const dateObj = new Date(timestamp * 1000);
+        
+    
+        // Create start and end of day
+        const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+    
+        // Find all appointments for the day
+        const appointments = await Appointment.find({
+          specialistId: specialistId,
+          date: {
+            $gte: startOfDay,
+            $lt: endOfDay
+          }
+        }).exec();
+    
+        // Find all other appointments for the specialist
+        const upcomingAppointments = await Appointment.find({ specialist: specialistId, date: { $gte: new Date() } });
+    
+        // Find the completed appointments for the specialist
+        const completedAppointments = await CompletedAppointment.find({ specialist: specialistId });
+    
+        // Send the response with the data
+        res.status(200).json({
+          message: 'Appointments found successfully',
+          data: {
+            appointment: appointments,
+            upcomingAppointmentsCount: upcomingAppointments.length,
+            completedAppointmentsCount: completedAppointments.length
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error finding appointments', error });
+      }
+    },
+
+
+
+    dayappointmentWorker:async(req,res)=>{
+
+      try {
+
+        const specialistId = req.body.specialistId;
+        const timestamp = req.body.date; // Unix timestamp in seconds
+        const dateObj = new Date(timestamp * 1000);
+        
+        // Create start and end of day
+        const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+        
+        const limit = 10; // number of appointments per page
+        const page = req.query.page || 1; // default to first page if not specified
+        const skip = (page - 1) * limit;
+        
+        // Find all appointments for the day with pagination
+        const appointments = await Appointment.find({
+          specialistId: specialistId,
+          date: {
+            $gte: startOfDay,
+            $lt: endOfDay
+          }
+        })
+        .skip(skip)
+        .limit(limit)
+        .exec();
+        
+        const count = await Appointment.countDocuments({
+          specialistId: specialistId,
+          date: {
+            $gte: startOfDay,
+            $lt: endOfDay
+          }
+        }).exec();
+        
+        const totalPages = Math.ceil(count / limit);
+        
+        res.status(200).json({
+          message: 'Appointments found successfully',
+          appointments: appointments,
+          upcomingCount: count,
+          totalPages: totalPages
+        });
+        
+        
+      } catch (error) {
+        res.status(500).json({message:'error', error})
+        
+      }
+      
     }
+    
     
     
     
