@@ -598,7 +598,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         .populate('userId')
         .populate('services')
         .populate('specialistId')
-        .lean();
+       
         
         
         if (upcomingAppointments.length === 0) {
@@ -606,10 +606,11 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         }
 
         upcomingAppointments.forEach((appointment)=>{
-          
-          appointment.specialistId.imagepath=`${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}`
-         
+          appointment.specialistId = { ...appointment.specialistId, imagepath: `${process.env.APP_URL}/cwash${appointment.specialistId.imagepath}` };
         })
+        
+        
+       
       
         
         return res.status(200).json({ message: 'success', appointments:upcomingAppointments });
