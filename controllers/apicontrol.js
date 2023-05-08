@@ -588,7 +588,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
 
 
         
-        return res.status(200).json({message:'success'})
+        return res.status(200).json({message:'success', completedAppointment})
       } catch (err) {
         res.status(500).json({message:'error',err})
         console.error(err);
