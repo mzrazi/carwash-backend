@@ -648,10 +648,11 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       try {
 
         const {userId}=req.body
+        console.log(userId);
 
         const appointments=await completedappointment.find({userId:userId,reviewed:false}).populate('specialistId services').exec()
        
-
+        console.log(appointments);
         if(!appointments){
           return res.status(404).json({message:'not found'})
         }
