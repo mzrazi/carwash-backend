@@ -846,7 +846,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       }
     },
 
-    specialistLogin:()=>{
+    specialistLogin:(req,res)=>{
       try {
         const { email, password, token } = req.body;
       const specialist= Specialist.findOne({ email })
