@@ -36,6 +36,11 @@ const completedAppointmentSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
+  status:{
+    type:String,
+    enum:['n/a','completed'],
+    default:'completed'
+  },
   reviewed:{
     type:Boolean,
   default:false,

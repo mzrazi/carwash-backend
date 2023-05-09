@@ -15,6 +15,14 @@ const specialistSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  whatsapp:{
+    type:String,
+    required:true
+  },
+  password: {
+  type: String,
+  required: true 
+  },
   reviews:[
     {
       type: mongoose.Schema.Types.ObjectId,

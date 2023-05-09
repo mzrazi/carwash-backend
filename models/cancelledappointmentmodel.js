@@ -45,7 +45,13 @@ cancelledby:{
 },
 reason:{
     type:String,
-}
+},
+ 
+status:{
+  type:String,
+  enum:['n/a','cancelled'],
+  default:'cancelled'
+},
 });
 
 module.exports = mongoose.model('CancelledAppointment', cancelledAppointmentSchema);

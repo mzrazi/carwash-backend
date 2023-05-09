@@ -21,7 +21,8 @@ const {
     gethistoryappointments,
     findAppointments,
     specialistCancelAppointment,
-    dayappointmentWorker
+    dayappointmentWorker,
+    editSpecialist
 } = require('../controllers/apicontrol');
 var router = express.Router();
 const multer=require('multer')
@@ -94,8 +95,9 @@ router.post('/user-notifications',getAllNotifications)
 router.post('/review-page',unreviewed)
 router.post('/specialist-reviews',specialistreviews)
 router.post('/history-appointments',gethistoryappointments)
-router.post('/specialist-home',findAppointments)
+router.post('/worker-home',findAppointments)
 router.post('/worker-cancel',specialistCancelAppointment)
 router.post('/worker-today',dayappointmentWorker)
+router.post('/edit-specialist',editSpecialist)
 module.exports = router;
 

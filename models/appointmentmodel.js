@@ -34,7 +34,6 @@ const appointmentSchema = new mongoose.Schema({
   },
 
   paid:{
-
     type:Boolean,
     default:false
   },
