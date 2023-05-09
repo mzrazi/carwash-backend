@@ -824,7 +824,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
     editSpecialist:async(req,res)=>{
       try {
         
-        const { name, categories, imagepath, whatsapp, password,specialistId } = req.body;
+        const { name,email, categories, imagepath, whatsapp, password,specialistId } = req.body;
         const encryptedpass= await bcrypt.hash(password, 10);
     
         const specialist = await Specialist.findById(specialistId);
@@ -835,8 +835,9 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         specialist.name = name || specialist.name;
         specialist.categories = categories || specialist.categories;
         specialist.imagepath = imagepath || specialist.imagepath;
-        specialist.whatsapp = whatsapp || specialist.whatsapp;
+        specialist.whatsapp = whatsapp || specialist.whatsappNumber;
         specialist.password = encryptedpass|| specialist.password;
+        specialist.email=email || specialist.email
     
         const updatedSpecialist = await specialist.save();
         return res.status(200).json({ message: 'Specialist updated successfully', updatedSpecialist });

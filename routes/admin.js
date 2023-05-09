@@ -95,8 +95,9 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
    
     var newspecialist= new specialist({
       name:data.name,
-      categories:data.categoryIds,
+      categories:data.categoryId,
       whatsapp:data.whatsappNumber,
+      email:data.email,
       password:data.password,
       imagepath:`/images/specialists/${req.file.filename}`
     })
