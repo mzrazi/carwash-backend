@@ -116,7 +116,7 @@ module.exports={
         }
     
       
-        const response = await admin.messaging().sendMulticast({
+        const response = await userapp.messaging().sendMulticast({
           tokens,
           notification: {
             title: title,

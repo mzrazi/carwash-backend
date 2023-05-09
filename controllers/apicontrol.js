@@ -938,7 +938,33 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         return res.status(200).json({ message: 'success', appointments:upcomingAppointments });
       } catch (error) {
         return res.status(500).json({ message: 'Error finding appointments', error: error.message });
-      }}
+      }},
+
+
+      workerCompleted:async (req,res)=>{
+        try {
+
+          const{id}=req.body
+          
+
+
+          const appointments=await  completedappointment.find({specialistId:id}) 
+          .populate('userId')
+          .populate('services')
+          .populate('specialistId')
+          .exec()
+
+
+          if(!appointments){
+           return res.status(404).json({message:'not found'})
+          }
+
+
+         return res.status(200).json({message:'success',appointments})
+        } catch (error) {
+         return  res.status(500).json({message:'error',error})
+        }
+      }
 
     
 
