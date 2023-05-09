@@ -454,7 +454,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const [appointmentId,reason]=req.body
         const appointment = await Appointment.findById(appointmentId)
         if (!appointment) {
-          throw new Error('Appointment not found');
+         return res.status(404).json({message:'Appointment not found'});
         }
         const cancelledAppointment = new CancelledAppointment({
           date: appointment.date,
@@ -467,8 +467,18 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           reason:reason,
           cancelledby:'specialist'
         });
-        await cancelledAppointment.save();
-        await Appointment.findByIdAndDelete(appointmentId);
+        const cancelled =await cancelledAppointment.save();
+
+        if(!cancelled){
+          return res.status(500).json({status:500 ,message:'cancellation error'})
+        }
+        const deleted=await Appointment.findByIdAndDelete(appointmentId);
+        if(!deleted){
+          cancelledAppointment.deleteOne()
+
+          return res.status(500).json({status:500 ,message:'cancellation error'})
+
+        }
 
         // const user=await User.findById(appointment.userId)
         // const tokens=user.tokens
@@ -715,7 +725,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
 
 
 
-     findAppointments:async (req, res) => {
+      findAppointments:async (req, res) => {
       try {
         const specialistId = req.body.specialistId;
         const timestamp = req.body.date; // Unix timestamp in seconds
