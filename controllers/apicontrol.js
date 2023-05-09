@@ -726,44 +726,48 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
 
 
       findAppointments:async (req, res) => {
-      try {
-        const specialistId = req.body.specialistId;
-        const timestamp = req.body.date; // Unix timestamp in seconds
-        const dateObj = new Date(timestamp * 1000);
-        
-    
-        // Create start and end of day
-        const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-        const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
-    
-        // Find all appointments for the day
-        const appointments = await Appointment.find({
-          specialistId: specialistId,
-          date: {
-            $gte: startOfDay,
-            $lt: endOfDay
-          }
-        }).exec();
-    
-        // Find all other appointments for the specialist
-        const upcomingAppointments = await Appointment.find({ specialist: specialistId, date: { $gte: dateObj } });
-    
-        // Find the completed appointments for the specialist
-        const completedAppointments = await CompletedAppointment.find({ specialist: specialistId });
-    
-        // Send the response with the data
-        res.status(200).json({
-          message: 'Appointments found successfully',
-          data: {
-            appointment: appointments,
-            upcomingAppointmentsCount: upcomingAppointments.length,
-            completedAppointmentsCount: completedAppointments.length
-          }
-        });
-      } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error finding appointments', error });
-      }
+        try {
+          const specialistId = req.body.specialistId;
+          const timestamp = req.body.date; // Unix timestamp in seconds
+          const dateObj = new Date(timestamp * 1000);
+      
+          // Create start and end of day
+          const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+          const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+      
+          // Find all appointments for the day
+          const appointments = await Appointment.find({
+            specialistId: specialistId,
+            date: {
+              $gte: startOfDay,
+              $lt: endOfDay
+            }
+          }).sort({ date: 'asc' }).exec();
+      
+          const completedAppointments = await CompletedAppointment.find({
+            specialistId: specialistId,
+            date: {
+              $gte: startOfDay,
+              $lt: endOfDay
+            }
+          }).sort({ date: 'asc' }).exec();
+      
+          // Find all other appointments for the specialist
+          const upcomingAppointments = await Appointment.find({ specialist: specialistId, date: { $gte: dateObj } });
+      
+          // Send the response with the data
+          res.status(200).json({
+            message: 'Appointments found successfully',
+            data: {
+              appointments: [...appointments, ...completedAppointments],
+              upcomingAppointmentsCount: upcomingAppointments.length,
+              completedAppointmentsCount: completedAppointments.length
+            }
+          });
+        } catch (error) {
+          console.log(error);
+          res.status(500).json({ message: 'Error finding appointments', error });
+        }
     },
 
 
