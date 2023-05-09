@@ -754,6 +754,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       
           // Find all other appointments for the specialist
           const upcomingAppointments = await Appointment.find({ specialist: specialistId, date: { $gte: dateObj } });
+
+          console.log(upcomingAppointments);
       
           // Send the response with the data
           res.status(200).json({
