@@ -846,10 +846,10 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       }
     },
 
-    specialistLogin:(req,res)=>{
+    specialistLogin:async(req,res)=>{
       try {
         const { email, password, token } = req.body;
-      const specialist= Specialist.findOne({ email })
+      const specialist=await  Specialist.findOne({ email })
           
           if (!specialist) {
             return res.status(401).json({status:401, message: "User not found" });
