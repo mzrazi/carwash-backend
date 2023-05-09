@@ -854,6 +854,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           if (!specialist) {
             return res.status(401).json({status:401, message: "User not found" });
           }
+          console.log(password);
+          console.log(specialist.password);
       const result=bcrypt.compare(password, specialist.password)
             if (!result) {
               return res.status(401).json({status:401, message: "Incorrect password" })
