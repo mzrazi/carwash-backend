@@ -96,6 +96,6 @@ router.post('/specialist-reviews',specialistreviews)
 router.post('/history-appointments',gethistoryappointments)
 router.post('/specialist-home',findAppointments)
 router.post('/worker-cancel',specialistCancelAppointment)
-router.post('worker-today',dayappointmentWorker)
+router.post('/worker-today',dayappointmentWorker)
 module.exports = router;
 
