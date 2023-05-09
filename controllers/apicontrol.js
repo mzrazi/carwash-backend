@@ -742,7 +742,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
               $gte: startOfDay,
               $lt: endOfDay
             }
-          }).sort({ date: 'asc' }).exec();
+          }).sort({ date: 'asc' }).populate('services')
+          .populate('specialistId').exec();
       
           const completedAppointments = await CompletedAppointment.find({
             specialistId: specialistId,
@@ -750,7 +751,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
               $gte: startOfDay,
               $lt: endOfDay
             }
-          }).sort({ date: 'asc' }).exec();
+          }).sort({ date: 'asc' }).populate('services')
+          .populate('specialistId').exec();
       
           // Find all other appointments for the specialist
           const upcomingAppointments = await Appointment.find({ specialist: specialistId, date: { $gte: dateObj } });
