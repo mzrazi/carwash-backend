@@ -11,7 +11,7 @@ const userSchema = new Schema({
     address:{type:String,default:null},
     pin:{type:String,default:null},
     password: { type: String, required: true },
-    imagepath:{type:String },
+    imagepath:{type:String,default:null },
     resetToken:{ type:String },
     resetTokenExpiration:{type:String},
     emailverified: { type: Boolean, default: false},
