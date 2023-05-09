@@ -610,10 +610,12 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
     getupcomingappointments:async(req,res)=>{
       try{
 
-        const userId=req.body.userId
+        const {date,userId}=req.body
+      
         const upcomingAppointments = await Appointment.find({
           userId: userId,
           status: 'booked'
+          
         })
         .populate('userId')
         .populate('services')
@@ -751,7 +753,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           .populate('userId').exec();
       
           // Find all other appointments for the specialist
-          const upcomingAppointments = await Appointment.find({ specialist: specialistId, date: { $gte: dateObj } });
+          const upcomingAppointments = await Appointment.find({ specialistId: specialistId, date: { $gte: dateObj } });
 
           console.log(upcomingAppointments);
       
@@ -785,7 +787,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
         
         const limit = 10; // number of appointments per page
-        const page = req.query.page || 1; // default to first page if not specified
+        const page = req.body.page || 1; // default to first page if not specified
         const skip = (page - 1) * limit;
         
         // Find all appointments for the day with pagination
@@ -888,22 +890,22 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const {id,status}=req.body
         if(status=="completed"){  
           
-        const completeddetails=await completedappointment.findById(id).populate('services').populate('specialistId').exec()
+        const completeddetails=await completedappointment.findById(id).populate('services').populate('userId').exec()
         if(!completeddetails){
           return res.status(404).json({status:404,message:"appointment not found"})
 
         }
         return res.status(200).json({status:200,message:'success',completeddetails})
-      }
+      }else{
 
-      const details=await Appointment.findById(id).populate('services').populate('specialistId').exec()
+      const details=await Appointment.findById(id).populate('services').populate('userId').exec()
       console.log(details);
       if(!details){
        return res.status(404).json({status:404,message:"appointment not found"})
       }
       return res.status(200).json({status:200,message:'success',details})
 
-       
+    }
        
         
       } catch (error) {
@@ -913,6 +915,31 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       }
 
 
-    }
+    },
+
+    Workerupcoming:async(req,res)=>{
+      try{
+
+        const {id}=req.body
+        const timestamp = req.body.date; // Unix timestamp in seconds
+        const dateObj = new Date(timestamp * 1000);
+        const upcomingAppointments = await Appointment.find({ specialistId:id, date: { $gte: dateObj } })
+        .populate('userId')
+        .populate('services')
+        .populate('specialistId')
+        .exec()
+       
+        
+        
+        if (upcomingAppointments.length === 0) {
+          return res.status(404).json({ message: 'No upcoming appointments found' });
+        }
+        
+        return res.status(200).json({ message: 'success', appointments:upcomingAppointments });
+      } catch (error) {
+        return res.status(500).json({ message: 'Error finding appointments', error: error.message });
+      }}
+
+    
 
     }
