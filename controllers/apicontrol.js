@@ -843,6 +843,35 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       } catch (error) {
         return res.status(500).json({ message: 'Error updating specialist', error });
       }
+    },
+
+    specialistLogin:()=>{
+      try {
+        const { email, password, token } = req.body;
+      const specialist= Specialist.findOne({ email })
+          
+          if (!specialist) {
+            return res.status(401).json({status:401, message: "User not found" });
+          }
+      const result=bcrypt.compare(password, specialist.password)
+            if (!result) {
+              return res.status(401).json({status:401, message: "Incorrect password" })
+            }
+            if(token){
+          specialist.tokens.push(token);
+           specialist.save()
+            }
+            
+              return res.status(200).json({status:200, message: "Login successful", specialist})
+          
+            
+        
+      } catch (error) {
+
+        return res.status(500).json({status:500, message: "Login error",error})
+        
+      }
+
     }
 
     }

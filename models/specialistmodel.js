@@ -29,7 +29,8 @@ const specialistSchema = new mongoose.Schema({
       ref: 'Review',
       required: true,
     }
-  ]
+  ],
+  tokens: [{ type: String,required:true }]
 });
 
 
