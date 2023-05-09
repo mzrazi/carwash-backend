@@ -753,7 +753,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           .populate('userId').exec();
       
           // Find all other appointments for the specialist
-          const upcomingAppointments = await Appointment.find({ specialistId: specialistId, date: { $gte: dateObj } });
+          const upcomingAppointments = await Appointment.find({ specialistId:specialistId, date: { $gte: dateObj } });
 
           console.log(upcomingAppointments);
       
