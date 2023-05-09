@@ -23,7 +23,8 @@ const {
     specialistCancelAppointment,
     dayappointmentWorker,
     editSpecialist,
-    specialistLogin
+    specialistLogin,
+    appointmentDetails
 } = require('../controllers/apicontrol');
 var router = express.Router();
 const multer=require('multer')
@@ -101,5 +102,6 @@ router.post('/worker-cancel',specialistCancelAppointment)
 router.post('/worker-today',dayappointmentWorker)
 router.post('/edit-specialist',editSpecialist)
 router.post('/worker-login',specialistLogin)
+router.post('/appointment-details',appointmentDetails)
 module.exports = router;
 

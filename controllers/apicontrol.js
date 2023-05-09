@@ -687,10 +687,6 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         let ratingSum = 0;
         reviews.forEach(review => {
           ratingSum += review.rating;
-          // Modify the imagePath property of each user object in the reviews array
-          if (review.userId) {
-            review.userId.imagepath = `${process.env.APP_URL}/cwash${review.userId.imagepath}`;
-          }
         });
         
         const averageRating = reviewCount > 0 ? ratingSum / reviewCount : 0;
@@ -882,6 +878,40 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         return res.status(500).json({status:500, message: "Login error",error})
         
       }
+
+    },
+
+
+    appointmentDetails:async(req,res)=>{
+      try {
+
+        const {id,status}=req.body
+        if(status=="completed"){  
+          
+        const completeddetails=await completedappointment.findById(id).populate('services').populate('specialistId').exec()
+        if(!completeddetails){
+          return res.status(404).json({status:404,message:"appointment not found"})
+
+        }
+        return res.status(200).json({status:200,message:'success',completeddetails})
+      }
+
+      const details=await Appointment.findById(id).populate('services').populate('specialistId').exec()
+      console.log(details);
+      if(!details){
+       return res.status(404).json({status:404,message:"appointment not found"})
+      }
+      return res.status(200).json({status:200,message:'success',details})
+
+       
+       
+        
+      } catch (error) {
+
+        res.status(500).json({status:500,message:"server error",error})
+        
+      }
+
 
     }
 
