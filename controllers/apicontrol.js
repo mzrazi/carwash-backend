@@ -831,6 +831,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         
         
       } catch (error) {
+        console.log(error);
         res.status(500).json({message:'error', error})
         
       }
@@ -942,7 +943,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         .populate('services')
         .populate('specialistId')
         .exec()
-       
+       console.log(upcomingAppointments);
         
         
         if (upcomingAppointments.length === 0) {
