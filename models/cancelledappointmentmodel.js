@@ -49,7 +49,7 @@ reason:{
  
 status:{
   type:String,
-  enum:['n/a','cancelled'],
+  enum:['N/a','cancelled'],
   default:'cancelled'
 },
 });
