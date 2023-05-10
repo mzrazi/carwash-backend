@@ -147,35 +147,29 @@ userSignup: async (req, res) => {
 
 
         verifyEmail: (req, res) => {
-          const token = req.params.token;
-          jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
-            if (err) {
-              console.log(decoded.email);
-              if (err.name === "TokenExpiredError") {
-                User.findOneAndDelete({ email: decoded.email }, (err, user) => {
-                  if (err) {
-                    return res.status(500).json({ error: err, message: "Deletion error" });
-                  }
-                  if (!user) {
-                    return res.status(401).json({ message: "User not found" });
-                  }
-                  return res.status(200).json({ status: 200, message: "User deleted due to expired token" });
-                });
-              } else {
-                return res.status(401).json({ status: 401, message: "Invalid token" });
-              }
-            } else {
-              const user = await User.findOne({ email: decoded.email });
-              console.log(user);
-              if (!user) {
-                return res.status(401).json({ status: 401, message: "User not found" });
-              }
-              user.emailverified = true;
-              await user.save();
-         
-              return res.status(200).json({ status: 200, message: "Email verified successfully" });
-            }
-          });
+          try {
+            
+            const token = req.params.token;
+            jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
+            
+              
+                const user = await User.findOne({ email: decoded.email });
+                console.log(user);
+                if (!user) {
+                  return res.status(401).json({ status: 401, message: "User not found" });
+                }
+                user.emailverified = true;
+                await user.save();
+           
+                return res.status(200).json({ status: 200, message: "Email verified successfully" });
+              })
+          
+            
+          } catch (error) {
+
+            return res.status(500).json({ message:"error ",error });
+            
+          }
         },
         
         
