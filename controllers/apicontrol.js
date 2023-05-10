@@ -802,7 +802,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         
         // Find all appointments for the day with pagination
         const appointments = await Appointment.find({
-          specialistId: specialistId,
+          specialistId:id,
           date: {
             $gte: startOfDay,
             $lt: endOfDay
@@ -813,7 +813,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         .exec();
         
         const count = await Appointment.countDocuments({
-          specialistId: specialistId,
+          specialistId:id,
           date: {
             $gte: startOfDay,
             $lt: endOfDay
