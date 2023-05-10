@@ -18,6 +18,7 @@ const CompletedAppointment = require('../models/completedappointment');
 const notificationmodel = require('../models/notificationmodel');
 const completedappointment = require('../models/completedappointment');
 const review = require('../models/reviewmodel');
+const workerNotification = require('../models/workernotificationmodel');
 
 
 
@@ -731,6 +732,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           const specialistId = req.body.specialistId;
           const timestamp = req.body.date; // Unix timestamp in seconds
           const dateObj = new Date(timestamp * 1000);
+
+          console.log(dateObj);
       
           // Create start and end of day
           const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
@@ -966,6 +969,28 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
          return res.status(200).json({message:'success',appointments})
         } catch (error) {
          return  res.status(500).json({message:'error',error})
+        }
+      },
+
+
+      getworkerNotifications:async(req,res)=>{
+  
+        const { specialistId } = req.body;
+      
+        try {
+          const Notifications= await workerNotification
+            .find({ $or: [{ user: specialistId }, { user: 'all' }] })
+            .sort({ createdAt: -1 })
+            .exec();
+      
+          if (Notifications.length === 0) {
+            return res.status(404).json({ success: false, message: 'notifications not found for user' });
+          }
+      
+          return res.status(200).json({ success: true, data: Notifications});
+        } catch (error) {
+          console.error(error);
+          return res.status(500).json({ success: false, message: 'Error fetching notifications' });
         }
       }
 

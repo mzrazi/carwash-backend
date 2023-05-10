@@ -26,7 +26,8 @@ const {
     specialistLogin,
     appointmentDetails,
     Workerupcoming,
-    workerCompleted
+    workerCompleted,
+    getworkerNotifications
 } = require('../controllers/apicontrol');
 var router = express.Router();
 const multer=require('multer')
@@ -107,5 +108,6 @@ router.post('/worker-login',specialistLogin)
 router.post('/appointment-details',appointmentDetails)
 router.post('/worker-upcoming',Workerupcoming)
 router.post('/worker-completed',workerCompleted)
+router.post('/worker-notifications',getworkerNotifications)
 module.exports = router;
 
