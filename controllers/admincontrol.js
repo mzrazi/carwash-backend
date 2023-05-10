@@ -96,6 +96,8 @@ module.exports={
 
     sendnotification:async(req,res)=>{
       const { title, message, selectedUsers } = req.body;
+
+      const body =message
       console.log(req.body);
     
       try {
@@ -121,8 +123,8 @@ module.exports={
         const response = await admin.messaging().sendMulticast({
           tokens,
           notification: {
-            title: title,
-            body: message
+            title:title,
+            body:body
           }
         });
         console.log('FCM response:', response);
