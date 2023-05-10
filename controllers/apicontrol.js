@@ -935,19 +935,19 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         console.log(timestamp);
         const dateObj = new Date(timestamp * 1000);
         console.log(dateObj);
-        const upcomingAppointments = await Appointment.find({ specialistId:id, date:{ $gte: dateObj } })
+        const appointments = await Appointment.find({ specialistId:id, date:{ $gte: dateObj } })
         .populate('userId')
         .populate('services')
         .populate('specialistId')
         .exec()
-       console.log('upcoming'+upcomingAppointments);
+       console.log('upcoming'+appointments);
         
         
-        if (upcomingAppointments.length === 0) {
+        if (appointments.length === 0) {
           return res.status(404).json({ message: 'No upcoming appointments found' });
         }
         
-        return res.status(200).json({ message: 'success', appointments:upcomingAppointments });
+        return res.status(200).json({ message: 'success', appointments });
       } catch (error) {
         return res.status(500).json({ message: 'Error finding appointments', error: error.message });
       }},
