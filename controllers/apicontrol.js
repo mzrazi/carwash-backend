@@ -732,7 +732,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           const specialistId = req.body.specialistId;
           const timestamp = req.body.date; // Unix timestamp in seconds
           const dateObj = new Date(timestamp * 1000);
-
+          console.log(timestamp);
           console.log(dateObj);
       
           // Create start and end of day
@@ -748,6 +748,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
             }
           }).sort({ date: 'asc' }).populate('services')
           .populate('userId').exec();
+
+          console.log(appointments);
       
           const completedAppointments = await CompletedAppointment.find({
             specialistId: specialistId,
@@ -761,7 +763,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           // Find all other appointments for the specialist
           const upcomingAppointments = await Appointment.find({ specialistId:specialistId, date: { $gte: dateObj } });
 
-          console.log(upcomingAppointments);
+          
       
           // Send the response with the data
           res.status(200).json({
