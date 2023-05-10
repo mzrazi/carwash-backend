@@ -796,9 +796,9 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const startOfDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
         const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
         
-        const limit = 10; // number of appointments per page
-        const page = req.body.page || 1; // default to first page if not specified
-        const skip = (page - 1) * limit;
+        // const limit = 10; // number of appointments per page
+        // const page = req.body.page || 1; // default to first page if not specified
+        // const skip = (page - 1) * limit;
         
         // Find all appointments for the day with pagination
         const appointments = await Appointment.find({
@@ -808,8 +808,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
             $lt: endOfDay
           }
         })
-        .skip(skip)
-        .limit(limit)
+        // .skip(skip)
+        // .limit(limit)
         .exec();
         
         const count = await Appointment.countDocuments({
@@ -820,13 +820,12 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           }
         }).exec();
         
-        const totalPages = Math.ceil(count / limit);
+        // const totalPages = Math.ceil(count / limit);
         
         res.status(200).json({
           message: 'Appointments found successfully',
           appointments: appointments,
-          upcomingCount: count,
-          totalPages: totalPages
+         
         });
         
         
