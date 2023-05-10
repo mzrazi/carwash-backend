@@ -808,6 +808,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
             $lt: endOfDay
           }
         })
+        .populate('userId')
+        .populate('specialistId')
         // .skip(skip)
         // .limit(limit)
         .exec();
