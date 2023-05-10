@@ -807,6 +807,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         // .skip(skip)
         // .limit(limit)
         .exec();
+
+        console.log('today'+appointments);
         
         const count = await Appointment.countDocuments({
           specialistId:id,
@@ -938,7 +940,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         .populate('services')
         .populate('specialistId')
         .exec()
-       console.log(upcomingAppointments);
+       console.log('upcoming'+upcomingAppointments);
         
         
         if (upcomingAppointments.length === 0) {
@@ -965,7 +967,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           .populate('services')
           .populate('specialistId')
           .exec()
-
+          console.log('completed'+appointments);
 
           if(!appointments){
            return res.status(404).json({message:'not found'})
