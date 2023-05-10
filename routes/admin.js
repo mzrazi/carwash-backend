@@ -119,7 +119,7 @@ router.post('/add-category',uploadCategories.single('image'),async(req,res)=>{
 
     router.post('/add-service',addservice)
 
-    router.post('/send-notfication',sendnotification)
+    router.post('/send-notification',sendnotification)
 
     router.post('/worker-sendnoti',workersendnotification)
   
