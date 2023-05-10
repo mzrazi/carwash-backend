@@ -146,31 +146,24 @@ userSignup: async (req, res) => {
 
 
 
-        verifyEmail: (req, res) => {
+        verifyEmail: async(req, res) => {
           try {
-            
             const token = req.params.token;
-            jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
-            
-              
-                const user = await User.findOne({ email: decoded.email });
-                console.log(user);
-                if (!user) {
-                  return res.status(401).json({ status: 401, message: "User not found" });
-                }
-                user.emailverified = true;
-                await user.save();
-           
-                return res.status(200).json({ status: 200, message: "Email verified successfully" });
-              })
-          
-            
+            const decoded = jwt.verify(token, process.env.SECRET_KEY);
+            const user = await User.findOne({ email: decoded.email });
+            console.log(user);
+            if (!user) {
+              return res.status(401).json({ status: 401, message: "User not found" });
+            }
+            user.emailverified = true;
+            await user.save();
+            return res.status(200).json({ status: 200, message: "Email verified successfully" });
           } catch (error) {
-
+            console.error(error);
             return res.status(500).json({ message:"error ",error });
-            
           }
-        },
+        }
+        ,
         
         
         
