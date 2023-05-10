@@ -787,6 +787,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       try {
 
         const specialistId = req.body.specialistId;
+
+        console.log(specialistId);
         const timestamp = req.body.date; // Unix timestamp in seconds
         const dateObj = new Date(timestamp * 1000);
         
@@ -929,6 +931,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       try{
 
         const {id}=req.body
+        console.log(id);
         const timestamp = req.body.date; // Unix timestamp in seconds
         const dateObj = new Date(timestamp * 1000);
         const upcomingAppointments = await Appointment.find({ specialistId:id, date: { $gte: dateObj } })
@@ -953,6 +956,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         try {
 
           const{id}=req.body
+
+          console.log(id);
           
 
 
