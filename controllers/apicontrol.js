@@ -1004,7 +1004,30 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
           console.error(error);
           return res.status(500).json({ success: false, message: 'Error fetching notifications' });
         }
+      },
+      
+      workerappreviews: async (req, res) => {
+        const { id } = req.body;
+  
+        console.log(id);
+        try {
+          const reviews = await review.find({ specialistId:id }).sort({ createdAt: -1 }).populate('userId').exec();
+          
+          console.log(reviews);
+          const reviewCount = reviews.length;
+          let ratingSum = 0;
+          reviews.forEach(review => {
+            ratingSum += review.rating;
+          });
+          
+          const averageRating = reviewCount > 0 ? ratingSum / reviewCount : 0;
+          res.status(200).json({ message: 'success', reviews, averageRating });
+        } catch (error) {
+          res.status(500).json({ message: 'error', error });
+        }
       }
+
+      
 
     
 
