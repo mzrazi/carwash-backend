@@ -452,7 +452,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
     specialistCancelAppointment:async(req,res)=> {
       try {
 
-        const [appointmentId,reason]=req.body
+        const {appointmentId,reason}=req.body
         const appointment = await Appointment.findById(appointmentId)
         if (!appointment) {
          return res.status(404).json({message:'Appointment not found'});
