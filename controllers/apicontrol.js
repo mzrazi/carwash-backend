@@ -232,7 +232,6 @@ userSignup: async (req, res) => {
           }
         },
         
-
         servicespage: async (req, res) => {
           try {
             const categoryId = req.body.categoryId;
@@ -247,12 +246,14 @@ userSignup: async (req, res) => {
         
             specialists.forEach((specialist) => {
               specialist.categories.forEach((category) => {
-                console.log(category.imagepath); // Before updating
                 category.imagepath = `${process.env.APP_URL}/cwash${category.imagepath}`;
-                console.log(category.imagepath); // After updating
               });
               specialist.imagepath = `${process.env.APP_URL}/cwash${specialist.imagepath}`;
-              console.log(specialist.imagepath); // After updating
+        
+              // Find the searched category in the categories array and move it to the beginning
+              const searchedCategory = specialist.categories.find((category) => category._id.toString() === categoryId);
+              const index = specialist.categories.indexOf(searchedCategory);
+              specialist.categories.splice(0, 0, specialist.categories.splice(index, 1)[0]);
             });
         
             res.status(200).json({ status: 200, message: "success", specialists });
@@ -260,7 +261,8 @@ userSignup: async (req, res) => {
             console.error(error);
             res.status(500).json({ message: "Error retrieving data" });
           }
-        },
+        }
+        ,
         
 
    addAppointment : async (req, res) => {
