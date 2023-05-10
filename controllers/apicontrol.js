@@ -685,7 +685,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
 
       console.log(id);
       try {
-        const reviews = await review.find({ specialisId: id }).sort({ createdAt: -1 }).populate('userId').exec();
+        const reviews = await review.find({ specialistId:id }).sort({ createdAt: -1 }).populate('userId').exec();
         
         console.log(reviews);
         const reviewCount = reviews.length;
