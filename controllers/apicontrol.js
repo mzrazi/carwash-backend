@@ -799,6 +799,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         })
         .populate('userId')
         .populate('specialistId')
+        .populate('services')
         // .skip(skip)
         // .limit(limit)
         .exec();
@@ -893,12 +894,12 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         const {id,status}=req.body
         if(status=="completed"){  
           
-        const completeddetails=await completedappointment.findById(id).populate('services').populate('userId').exec()
+        const details=await completedappointment.findById(id).populate('services').populate('userId').exec()
         if(!completeddetails){
           return res.status(404).json({status:404,message:"appointment not found"})
 
         }
-        return res.status(200).json({status:200,message:'success',completeddetails})
+        return res.status(200).json({status:200,message:'success',details})
       }else{
 
       const details=await Appointment.findById(id).populate('services').populate('userId').exec()
