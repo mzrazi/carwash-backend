@@ -592,7 +592,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       } catch (err) {
         res.status(500).json({message:'error',err})
         console.error(err);
-        throw err;
+        
       }
 
     },
@@ -892,6 +892,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
       try {
 
         const {id,status}=req.body
+
+        console.log(req.body);
         if(status=="completed"){  
           
         const details=await completedappointment.findById(id).populate('services').populate('userId').exec()
@@ -913,6 +915,7 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
        
         
       } catch (error) {
+        console.log(error);
 
         res.status(500).json({status:500,message:"server error",error})
         

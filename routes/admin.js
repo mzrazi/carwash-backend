@@ -5,7 +5,6 @@ var mongoose = require('mongoose')
 var Offer=require('../models/offersmodel')
 var path=require('path')
 var Category=require('../models/categorymodel');
-const { log } = require('console');
 const specialist = require('../models/specialistmodel');
 const fs = require('fs');
 const { addContact, addservice, sendnotification, workersendnotification } = require('../controllers/admincontrol');

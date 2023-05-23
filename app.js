@@ -6,8 +6,6 @@ var logger = require('morgan');
 const dbConnect = require('./config/connection');
 const multer = require('multer');
 
-require('dotenv').config();
-var app = express();
 
 
 var apiRouter = require('./routes/api');
