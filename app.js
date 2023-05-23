@@ -6,12 +6,12 @@ var logger = require('morgan');
 const dbConnect = require('./config/connection');
 const multer = require('multer');
 
+require('dotenv').config();
+var app = express();
 
 
 var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
-require('dotenv').config();
-var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
