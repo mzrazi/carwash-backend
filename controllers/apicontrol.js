@@ -896,8 +896,8 @@ console.log(date); // output: Wed May 05 2021 15:45:01 GMT-0400 (Eastern Dayligh
         console.log(req.body);
         if(status=="completed"){  
           
-        const completeddetails=await completedappointment.findById(id).populate('services').populate('userId').exec()
-        if(!completeddetails){
+        const details=await completedappointment.findById(id).populate('services').populate('userId').exec()
+        if(!details){
           return res.status(404).json({status:404,message:"appointment not found"})
 
         }
